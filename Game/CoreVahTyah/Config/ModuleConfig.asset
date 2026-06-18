@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 051c72e4709cfc449876c90a139fd5d8, type: 3}
+  m_Name: ModuleConfig
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleConfig
+  DebugLogs: 0
+  Modules:
+  - {fileID: 11400000, guid: 4793765cdeff6e74caff1539b9b806aa, type: 2}
+  - {fileID: 11400000, guid: 4969ddead3141334880ade6788ea0802, type: 2}
+  - {fileID: 11400000, guid: dcaaf7d44c8136340964166715cb6750, type: 2}
+  - {fileID: 11400000, guid: 80db5c99713f4ee45b112162899b65c8, type: 2}
+  - {fileID: 11400000, guid: 020c0a56f7e337b4f8df528386a3d2ff, type: 2}
+  - {fileID: 11400000, guid: 4f020889991fed547b143a02304a4b90, type: 2}
+  - {fileID: 11400000, guid: 1650068cfdd7c4b43b01014113f1b407, type: 2}
