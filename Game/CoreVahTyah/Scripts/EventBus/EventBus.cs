@@ -7,7 +7,10 @@ namespace VahTyah
 {
     public static class EventBus
     {
-        private abstract class Channel { }
+        private abstract class Channel
+        {
+            public abstract void Clear();
+        }
 
         private sealed class Channel<T> : Channel where T : struct, IEvent
         {
@@ -20,20 +23,41 @@ namespace VahTyah
             }
 
             public readonly List<Entry> Entries = new List<Entry>(4);
+            public int AsyncCount;
+            public readonly Stack<List<Entry>> Pool = new Stack<List<Entry>>(4);
 
             public void Insert(Entry e)
             {
                 int i;
                 for (i = 0; i < Entries.Count && Entries[i].Priority <= e.Priority; i++) { }
                 Entries.Insert(i, e);
+                if (e.Async != null) AsyncCount++;
+            }
+
+            public override void Clear()
+            {
+                Entries.Clear();
+                Pool.Clear();
+                AsyncCount = 0;
             }
         }
 
-        private static readonly Dictionary<Type, Channel> _channels = new Dictionary<Type, Channel>();
-
-        private static class SnapshotPool<T> where T : struct, IEvent
+        private static class ChannelOf<T> where T : struct, IEvent
         {
-            public static readonly Stack<List<Channel<T>.Entry>> Pool = new Stack<List<Channel<T>.Entry>>(4);
+            public static Channel<T> Value;
+        }
+
+        private static readonly List<Channel> _all = new List<Channel>();
+
+        private static Channel<T> Chan<T>() where T : struct, IEvent
+        {
+            var c = ChannelOf<T>.Value;
+            if (c == null)
+            {
+                c = ChannelOf<T>.Value = new Channel<T>();
+                _all.Add(c);
+            }
+            return c;
         }
 
         public static object On<T>(Action<T> handler, int priority = 0) where T : struct, IEvent
@@ -50,12 +74,14 @@ namespace VahTyah
 
         public static void Off<T>(object tag) where T : struct, IEvent
         {
-            if (!_channels.TryGetValue(typeof(T), out var c)) return;
-            var list = ((Channel<T>)c).Entries;
+            var c = ChannelOf<T>.Value;
+            if (c == null) return;
+            var list = c.Entries;
             for (int i = 0; i < list.Count; i++)
             {
                 if ((object)list[i].Sync == tag || (object)list[i].Async == tag)
                 {
+                    if (list[i].Async != null) c.AsyncCount--;
                     list.RemoveAt(i);
                     break;
                 }
@@ -64,22 +90,44 @@ namespace VahTyah
 
         public static UniTask Publish<T>(in T evt) where T : struct, IEvent
         {
-            if (!_channels.TryGetValue(typeof(T), out var c))
-                return UniTask.CompletedTask;
+            var c = ChannelOf<T>.Value;
+            if (c == null) return UniTask.CompletedTask;
 
-            var entries = ((Channel<T>)c).Entries;
-            if (entries.Count == 0)
-                return UniTask.CompletedTask;
+            var entries = c.Entries;
+            if (entries.Count == 0) return UniTask.CompletedTask;
 
-            var snapshot = SnapshotPool<T>.Pool.Count > 0
-                ? SnapshotPool<T>.Pool.Pop()
+            var snapshot = c.Pool.Count > 0
+                ? c.Pool.Pop()
                 : new List<Channel<T>.Entry>(8);
             snapshot.AddRange(entries);
 
-            return Dispatch(evt, snapshot);
+            if (c.AsyncCount == 0)
+            {
+                DispatchSync(c, evt, snapshot);
+                return UniTask.CompletedTask;
+            }
+
+            return Dispatch(c, evt, snapshot);
         }
 
-        private static async UniTask Dispatch<T>(T evt, List<Channel<T>.Entry> snapshot) where T : struct, IEvent
+        private static void DispatchSync<T>(Channel<T> c, T evt, List<Channel<T>.Entry> snapshot) where T : struct, IEvent
+        {
+            try
+            {
+                for (int i = 0; i < snapshot.Count; i++)
+                {
+                    try { snapshot[i].Sync(evt); }
+                    catch (Exception ex) { Debug.LogError($"[EventBus] {typeof(T).Name}: {ex.Message}"); }
+                }
+            }
+            finally
+            {
+                snapshot.Clear();
+                c.Pool.Push(snapshot);
+            }
+        }
+
+        private static async UniTask Dispatch<T>(Channel<T> c, T evt, List<Channel<T>.Entry> snapshot) where T : struct, IEvent
         {
             try
             {
@@ -114,11 +162,10 @@ namespace VahTyah
             finally
             {
                 snapshot.Clear();
-                SnapshotPool<T>.Pool.Push(snapshot);
+                c.Pool.Push(snapshot);
             }
         }
 
-        /// <summary>Chờ event T xảy ra lần kế tiếp (one-shot). Tự gỡ listener sau khi nhận.</summary>
         public static UniTask<T> WaitFor<T>() where T : struct, IEvent
         {
             var tcs = new UniTaskCompletionSource<T>();
@@ -133,15 +180,14 @@ namespace VahTyah
         }
 
         public static bool HasListeners<T>() where T : struct, IEvent
-            => _channels.TryGetValue(typeof(T), out var c) && ((Channel<T>)c).Entries.Count > 0;
-
-        public static void Reset() => _channels.Clear();
-
-        private static Channel<T> Chan<T>() where T : struct, IEvent
         {
-            if (!_channels.TryGetValue(typeof(T), out var c))
-                c = _channels[typeof(T)] = new Channel<T>();
-            return (Channel<T>)c;
+            var c = ChannelOf<T>.Value;
+            return c != null && c.Entries.Count > 0;
+        }
+
+        public static void Reset()
+        {
+            foreach (var c in _all) c.Clear();
         }
     }
 
