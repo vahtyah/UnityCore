@@ -1,7 +1,8 @@
 namespace VahTyah
 {
-    /// <summary>Tiến độ boot (0..1). View loading nghe để cập nhật thanh.</summary>
-    public struct BootProgress : IEvent { public float Value; public string Message; }
+    /// <summary>Loading bar đã chạy xong đoạn intro (0→intro target) theo thời gian.
+    /// Bootstrap chờ event này (sau khi InitModules xong) rồi mới cho load scene.</summary>
+    public struct BootIntroReady : IEvent { }
 
     /// <summary>Boot hoàn tất (đã init module + load scene đầu). View loading nghe để ẩn.</summary>
     public struct BootCompleted : IEvent { }

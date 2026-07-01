@@ -36,17 +36,23 @@ namespace VahTyah
             return UniTask.CompletedTask;
         }
 
+        private bool _bootReady;
+
         public override void Subscribe()
         {
-            EventBus.OnAsync<TransitionRequest>(OnTransition);
+            /*EventBus.OnAsync<TransitionRequest>(OnTransition);
 
-            // Trước load scene → che màn hình
+            // Trong lúc boot, LoadingScreen đã che toàn màn — không cho Transition cover/uncover
+            // để tránh fade chồng fade (nhấp nháy) khi load scene game đầu tiên. Chỉ bật sau boot.
+            EventBus.On<BootCompleted>(_ => _bootReady = true);
+
+            // Trước load scene → che màn hình (bỏ qua khi đang boot)
             EventBus.OnAsync<SceneLoadRequest>(
-                _ => EventBus.Publish(new TransitionRequest { Cover = true }), -1000);
+                _ => _bootReady ? EventBus.Publish(new TransitionRequest { Cover = true }) : UniTask.CompletedTask, -1000);
 
-            // Sau load scene → mở màn hình
+            // Sau load scene → mở màn hình (bỏ qua khi đang boot)
             EventBus.OnAsync<SceneLoaded>(
-                _ => EventBus.Publish(new TransitionRequest { Cover = false }), -50);
+                _ => _bootReady ? EventBus.Publish(new TransitionRequest { Cover = false }) : UniTask.CompletedTask, -50);*/
         }
 
         private UniTask OnTransition(TransitionRequest e)

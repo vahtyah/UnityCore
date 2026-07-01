@@ -13,14 +13,18 @@ namespace VahTyah
 
         private async UniTask BootAsync()
         {
+            await UniTask.Yield();
+
             bool debug = Config != null && Config.DebugLogs;
+
+            var introReady = EventBus.WaitFor<BootIntroReady>();
 
             await InitModules(debug);
 
-            EventBus.Publish(new BootProgress { Value = 0.85f, Message = "Đang tải màn chơi..." }).Forget();
+            await introReady;
+
             await EventBus.Publish(new LoadEntryScene());
 
-            EventBus.Publish(new BootProgress { Value = 1f, Message = "Hoàn tất" }).Forget();
             EventBus.Publish(new BootCompleted()).Forget();
 
             if (debug) Debug.Log("[VahTyah] Boot complete.");
@@ -38,10 +42,6 @@ namespace VahTyah
                 return;
             }
 
-            EventBus.Publish(new BootProgress { Value = 0f, Message = "Đang khởi tạo..." }).Forget();
-
-            int total = modules.Length;
-
             for (int i = 0; i < modules.Length; i++)
             {
                 var m = modules[i];
@@ -55,8 +55,6 @@ namespace VahTyah
                 {
                     Debug.LogError($"[VahTyah] {m.name} boot failed: {e.Message}\n{e.StackTrace}");
                 }
-
-                EventBus.Publish(new BootProgress { Value = (i + 1) / (float)total * 0.85f }).Forget();
             }
         }
 
