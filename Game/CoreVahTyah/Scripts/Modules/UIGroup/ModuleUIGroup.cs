@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -6,10 +6,10 @@ namespace VahTyah
     [CreateAssetMenu(menuName = "VahTyah/Modules/UIGroup", fileName = "Module_UIGroup")]
     public sealed class ModuleUIGroup : Module
     {
-        public override Task InitializeAsync(Transform transform)
+        public override UniTask InitializeAsync(Transform transform)
         {
             Services.Register(new UIGroupService());
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         public override void Subscribe()

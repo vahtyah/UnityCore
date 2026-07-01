@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+
 namespace VahTyah
 {
     /// <summary>Lệnh: yêu cầu chuyển màn (ai cũng publish được, không cần biết ScreenRouter).</summary>
@@ -16,7 +18,7 @@ namespace VahTyah
             Current = screen;
 
             Services.Get<UIGroupService>().ShowExclusive(screen);
-            EventBus.Publish(new ScreenChanged { Screen = screen });
+            EventBus.Publish(new ScreenChanged { Screen = screen }).Forget();
         }
     }
 }

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -42,14 +42,14 @@ namespace VahTyah
             }
         }
 
-        public override Task InitializeAsync(Transform holder)
+        public override UniTask InitializeAsync(Transform holder)
         {
             var save = Services.Get<SaveService>();
             _save = save.Load<LevelSaveData>(SaveKey);
             Current = _save.Level;
 
             SpawnDisplay(holder);
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         private void SpawnDisplay(Transform holder)
@@ -93,7 +93,7 @@ namespace VahTyah
             _save.Level = Mathf.Max(1, e.Level);
             _save.Tries = 0;
             Persist();
-            EventBus.Publish(new LevelChanged { Level = _save.Level });
+            EventBus.Publish(new LevelChanged { Level = _save.Level }).Forget();
         }
 
         private void OnTransition(TransitionRequest e)
@@ -108,7 +108,7 @@ namespace VahTyah
             _save.Level++;
             _save.Tries = 0;
             Persist();
-            EventBus.Publish(new LevelChanged { Level = _save.Level });
+            EventBus.Publish(new LevelChanged { Level = _save.Level }).Forget();
         }
 
         private void Persist()

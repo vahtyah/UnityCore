@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -12,7 +12,7 @@ namespace VahTyah
         // key bằng int (cast từ enum) để tra O(1) không box. Reorder list không ảnh hưởng.
         private readonly Dictionary<int, ParticleEntry> _byId = new Dictionary<int, ParticleEntry>();
 
-        public override Task InitializeAsync(Transform holder)
+        public override UniTask InitializeAsync(Transform holder)
         {
             _byId.Clear();
             bool hasPool = Services.Has<PoolService>();
@@ -29,7 +29,7 @@ namespace VahTyah
             if (!hasPool)
                 Debug.LogWarning("[Particle] Cần ModulePool boot trước ModuleParticle để prewarm.");
 
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         public override void Subscribe()

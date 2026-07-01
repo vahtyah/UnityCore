@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -47,9 +47,9 @@ namespace VahTyah
             _canvasGroup.interactable = false;
         }
 
-        public Task PlayAsync(bool cover, Sprite sprite)
+        public UniTask PlayAsync(bool cover, Sprite sprite)
         {
-            var tcs = new TaskCompletionSource<bool>();
+            var tcs = new UniTaskCompletionSource();
 
             if (_animator != null)
                 StartCoroutine(AnimatorRoutine(cover, tcs));
@@ -59,7 +59,7 @@ namespace VahTyah
             return tcs.Task;
         }
 
-        private IEnumerator AnimatorRoutine(bool cover, TaskCompletionSource<bool> tcs)
+        private IEnumerator AnimatorRoutine(bool cover, UniTaskCompletionSource tcs)
         {
             _animator.SetBool("transition", cover);
             yield return null;
@@ -70,10 +70,10 @@ namespace VahTyah
             while (_animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f)
                 yield return null;
 
-            tcs.SetResult(true);
+            tcs.TrySetResult();
         }
 
-        private IEnumerator FadeRoutine(bool cover, Sprite sprite, TaskCompletionSource<bool> tcs)
+        private IEnumerator FadeRoutine(bool cover, Sprite sprite, UniTaskCompletionSource tcs)
         {
             if (sprite != null)
             {
@@ -101,7 +101,7 @@ namespace VahTyah
 
             _canvasGroup.alpha = to;
             _canvasGroup.blocksRaycasts = cover;
-            tcs.SetResult(true);
+            tcs.TrySetResult();
         }
     }
 }

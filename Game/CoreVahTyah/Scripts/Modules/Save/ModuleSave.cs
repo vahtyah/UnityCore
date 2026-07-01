@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -9,7 +9,7 @@ namespace VahTyah
         [Tooltip("Tự động save mỗi N giây (0 = tắt).")]
         [SerializeField] private float _autoSaveInterval = 30f;
 
-        public override Task InitializeAsync(Transform holder)
+        public override UniTask InitializeAsync(Transform holder)
         {
             var service = new SaveService();
             service.AddProvider(new LocalSaveProvider());

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -19,7 +19,7 @@ namespace VahTyah
         private readonly Dictionary<int, SoundEntry> _byId = new Dictionary<int, SoundEntry>();
         private readonly Dictionary<int, float> _lastPlay = new Dictionary<int, float>();
 
-        public override Task InitializeAsync(Transform holder)
+        public override UniTask InitializeAsync(Transform holder)
         {
             var go = new GameObject("[SoundPool]");
             go.transform.SetParent(holder);
@@ -35,7 +35,7 @@ namespace VahTyah
             foreach (var s in Sounds)
                 _byId[(int)s.Id] = s;
 
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         public override void Subscribe()

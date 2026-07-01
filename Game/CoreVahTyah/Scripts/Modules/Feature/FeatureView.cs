@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -24,7 +25,7 @@ namespace VahTyah
         {
             _received = false;
             this.On<FeatureState>(OnState);
-            EventBus.Publish(new FeatureRefresh());
+            EventBus.Publish(new FeatureRefresh()).Forget();
 
             if (!_received)
                 OnInactive?.Invoke();

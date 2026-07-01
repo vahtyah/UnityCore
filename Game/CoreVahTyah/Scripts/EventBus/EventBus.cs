@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -16,7 +16,7 @@ namespace VahTyah
                 public int Priority;
                 public bool WaitFor;
                 public Action<T> Sync;
-                public Func<T, Task> Async;
+                public Func<T, UniTask> Async;
             }
 
             public readonly List<Entry> Entries = new List<Entry>(4);
@@ -42,7 +42,7 @@ namespace VahTyah
             return handler;
         }
 
-        public static object OnAsync<T>(Func<T, Task> handler, int priority = 0, bool waitFor = true) where T : struct, IEvent
+        public static object OnAsync<T>(Func<T, UniTask> handler, int priority = 0, bool waitFor = true) where T : struct, IEvent
         {
             Chan<T>().Insert(new Channel<T>.Entry { Priority = priority, WaitFor = waitFor, Async = handler });
             return handler;
@@ -62,14 +62,14 @@ namespace VahTyah
             }
         }
 
-        public static Task Publish<T>(in T evt) where T : struct, IEvent
+        public static UniTask Publish<T>(in T evt) where T : struct, IEvent
         {
             if (!_channels.TryGetValue(typeof(T), out var c))
-                return Task.CompletedTask;
+                return UniTask.CompletedTask;
 
             var entries = ((Channel<T>)c).Entries;
             if (entries.Count == 0)
-                return Task.CompletedTask;
+                return UniTask.CompletedTask;
 
             var snapshot = SnapshotPool<T>.Pool.Count > 0
                 ? SnapshotPool<T>.Pool.Pop()
@@ -79,7 +79,7 @@ namespace VahTyah
             return Dispatch(evt, snapshot);
         }
 
-        private static async Task Dispatch<T>(T evt, List<Channel<T>.Entry> snapshot) where T : struct, IEvent
+        private static async UniTask Dispatch<T>(T evt, List<Channel<T>.Entry> snapshot) where T : struct, IEvent
         {
             try
             {
@@ -94,16 +94,14 @@ namespace VahTyah
                         }
                         else if (e.Async != null)
                         {
-                            Task task = e.Async(evt);
                             if (e.WaitFor)
                             {
-                                await task;
+                                await e.Async(evt);
                             }
                             else
                             {
-                                task.ContinueWith(
-                                    t => Debug.LogError($"[EventBus] {typeof(T).Name} async error: {t.Exception?.InnerException?.Message}"),
-                                    TaskContinuationOptions.OnlyOnFaulted);
+                                e.Async(evt).Forget(
+                                    ex => Debug.LogError($"[EventBus] {typeof(T).Name} async error: {ex.Message}"));
                             }
                         }
                     }
@@ -121,9 +119,9 @@ namespace VahTyah
         }
 
         /// <summary>Chờ event T xảy ra lần kế tiếp (one-shot). Tự gỡ listener sau khi nhận.</summary>
-        public static Task<T> WaitFor<T>() where T : struct, IEvent
+        public static UniTask<T> WaitFor<T>() where T : struct, IEvent
         {
-            var tcs = new TaskCompletionSource<T>();
+            var tcs = new UniTaskCompletionSource<T>();
             Action<T> handler = null;
             handler = e =>
             {
@@ -155,7 +153,7 @@ namespace VahTyah
             Cleaner(owner).Register(() => EventBus.Off<T>(tag));
         }
 
-        public static void OnAsync<T>(this MonoBehaviour owner, Func<T, Task> handler, int priority = 0, bool waitFor = true) where T : struct, IEvent
+        public static void OnAsync<T>(this MonoBehaviour owner, Func<T, UniTask> handler, int priority = 0, bool waitFor = true) where T : struct, IEvent
         {
             object tag = EventBus.OnAsync(handler, priority, waitFor);
             Cleaner(owner).Register(() => EventBus.Off<T>(tag));

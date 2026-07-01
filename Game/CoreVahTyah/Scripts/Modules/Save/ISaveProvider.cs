@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace VahTyah
 {
@@ -7,10 +7,10 @@ namespace VahTyah
         string Name { get; }
         bool IsAvailable { get; }
 
-        Task InitializeAsync();
-        Task SaveAsync<T>(string key, T data) where T : class;
-        Task<T> LoadAsync<T>(string key) where T : class, new();
-        Task DeleteAsync(string key);
-        Task<bool> ExistsAsync(string key);
+        UniTask InitializeAsync();
+        UniTask SaveAsync<T>(string key, T data) where T : class;
+        UniTask<T> LoadAsync<T>(string key) where T : class, new();
+        UniTask DeleteAsync(string key);
+        UniTask<bool> ExistsAsync(string key);
     }
 }

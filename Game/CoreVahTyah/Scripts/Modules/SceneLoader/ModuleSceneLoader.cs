@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,14 +17,14 @@ namespace VahTyah
         }
 
         // Bootstrap gọi 1 lần sau khi mọi module sẵn sàng. SceneLoader tự quyết index.
-        private Task HandleEntryScene(LoadEntryScene _)
+        private UniTask HandleEntryScene(LoadEntryScene _)
         {
             int index = SceneRedirect.OverrideSceneIndex;   // editor: scene đang test
             if (index < 0) index = EntrySceneIndex;          // mặc định
             return EventBus.Publish(new SceneLoadRequest { Index = index });
         }
 
-        private async Task HandleSceneLoad(SceneLoadRequest e)
+        private async UniTask HandleSceneLoad(SceneLoadRequest e)
         {
             int index = e.Index;
 
@@ -37,8 +37,7 @@ namespace VahTyah
                 return;
             }
 
-            while (!op.isDone)
-                await Task.Yield();
+            await op;
 
             await EventBus.Publish(new SceneLoaded { Index = index });
         }

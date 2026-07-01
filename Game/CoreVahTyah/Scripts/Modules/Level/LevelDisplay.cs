@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
@@ -33,7 +34,7 @@ namespace VahTyah
             if (_text == null) return;
 
             int level = 0;
-            EventBus.Publish(new LevelGet { Reply = v => level = v });
+            EventBus.Publish(new LevelGet { Reply = v => level = v }).Forget();
             _text.SetText(_format, level);
         }
     }

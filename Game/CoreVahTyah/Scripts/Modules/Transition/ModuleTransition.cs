@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -15,7 +15,7 @@ namespace VahTyah
 
         private TransitionController _controller;
 
-        public override Task InitializeAsync(Transform holder)
+        public override UniTask InitializeAsync(Transform holder)
         {
             var go = new GameObject("[Transition]");
             go.transform.SetParent(holder);
@@ -33,7 +33,7 @@ namespace VahTyah
                 _controller.InitFallback(_fadeColor, _fadeDuration);
             }
 
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         public override void Subscribe()
@@ -49,7 +49,7 @@ namespace VahTyah
                 _ => EventBus.Publish(new TransitionRequest { Cover = false }), -50);
         }
 
-        private Task OnTransition(TransitionRequest e)
+        private UniTask OnTransition(TransitionRequest e)
         {
             return _controller.PlayAsync(e.Cover, _sprite);
         }

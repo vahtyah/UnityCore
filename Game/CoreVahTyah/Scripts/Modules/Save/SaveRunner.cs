@@ -1,4 +1,5 @@
 using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -23,19 +24,19 @@ namespace VahTyah
             {
                 yield return wait;
                 if (_service.IsDirty)
-                    _service.SaveAllAsync();
+                    _service.SaveAllAsync().Forget();
             }
         }
 
         private void OnApplicationPause(bool paused)
         {
             if (paused && _service != null)
-                _service.SaveAllAsync();
+                _service.SaveAllAsync().Forget();
         }
 
         private void OnApplicationQuit()
         {
-            _service?.SaveAllAsync();
+            _service?.SaveAllAsync().Forget();
         }
 
         private void OnDestroy()

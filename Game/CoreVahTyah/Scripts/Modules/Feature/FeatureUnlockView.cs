@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -25,7 +26,7 @@ namespace VahTyah
             EventBus.On<TransitionRequest>(e =>
             {
                 if (!e.Cover)
-                    EventBus.Publish(new FeatureConsumePending());
+                    EventBus.Publish(new FeatureConsumePending()).Forget();
             });
 
             EventBus.On<FeaturePendingUnlock>(OnPending);

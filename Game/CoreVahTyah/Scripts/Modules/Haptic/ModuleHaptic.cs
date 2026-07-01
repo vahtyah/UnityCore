@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -27,11 +27,11 @@ namespace VahTyah
 
         private bool Active => _save == null || _save.Active;
 
-        public override Task InitializeAsync(Transform holder)
+        public override UniTask InitializeAsync(Transform holder)
         {
             _save = Services.Get<SaveService>().Load<HapticSaveData>(SaveKey);
             _provider = CreateProvider();
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         private IHapticProvider CreateProvider()
@@ -61,7 +61,7 @@ namespace VahTyah
             _provider.Play(e.Type);
         }
 
-        private async Task OnSequence(HapticSequence e)
+        private async UniTask OnSequence(HapticSequence e)
         {
             if (e.Types == null || e.Types.Length == 0) return;
             if (!CanPlay(e.Force)) return;
@@ -70,7 +70,7 @@ namespace VahTyah
             {
                 int ms = _provider.Play(e.Types[i]);
                 if (i < e.Types.Length - 1)
-                    await Task.Delay(ms + _gapMs);
+                    await UniTask.Delay(ms + _gapMs);
             }
         }
 
@@ -78,7 +78,7 @@ namespace VahTyah
         {
             _save.Active = e.Active;
             Services.Get<SaveService>().Set(SaveKey, _save);
-            EventBus.Publish(new HapticChanged { Active = e.Active });
+            EventBus.Publish(new HapticChanged { Active = e.Active }).Forget();
         }
 
         // Active chặn trước; Force chỉ bỏ qua cooldown (không ghi đè user tắt haptic).

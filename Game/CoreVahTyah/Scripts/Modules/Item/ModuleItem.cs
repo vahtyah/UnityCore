@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -37,7 +37,7 @@ namespace VahTyah
         private ItemAnimationRunner _runner;
         private readonly Dictionary<string, int> _inFlight = new Dictionary<string, int>();
 
-        public override Task InitializeAsync(Transform holder)
+        public override UniTask InitializeAsync(Transform holder)
         {
             var saveService = Services.Get<SaveService>();
             _save = saveService.Load<ItemSaveData>(SaveKey);
@@ -60,7 +60,7 @@ namespace VahTyah
             _runner = canvasObj.AddComponent<ItemAnimationRunner>();
             _runner.Initialize(this);
 
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         public override void Subscribe()
@@ -80,7 +80,7 @@ namespace VahTyah
                 entry.Current += e.Value;
 
             Persist();
-            EventBus.Publish(new ItemChanged { Key = e.Key });
+            EventBus.Publish(new ItemChanged { Key = e.Key }).Forget();
         }
 
         private void OnGet(ItemGet e)
@@ -103,10 +103,10 @@ namespace VahTyah
 
             Persist();
             if (amount > 0)
-                EventBus.Publish(new ItemChanged { Key = e.Key });
+                EventBus.Publish(new ItemChanged { Key = e.Key }).Forget();
         }
 
-        private Task OnAnimationPlay(ItemAnimationPlay e)
+        private UniTask OnAnimationPlay(ItemAnimationPlay e)
         {
             _inFlight.TryGetValue(e.Key, out int flight);
             _inFlight[e.Key] = flight + e.Value;

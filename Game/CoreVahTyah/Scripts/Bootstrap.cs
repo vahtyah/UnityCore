@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -9,24 +9,24 @@ namespace VahTyah
     {
         public ModuleConfig Config;
 
-        protected override void OnInitialize() => BootAsync();
+        protected override void OnInitialize() => BootAsync().Forget();
 
-        private async Task BootAsync()
+        private async UniTask BootAsync()
         {
             bool debug = Config != null && Config.DebugLogs;
 
             await InitModules(debug);
 
-            EventBus.Publish(new BootProgress { Value = 0.85f, Message = "Đang tải màn chơi..." });
+            EventBus.Publish(new BootProgress { Value = 0.85f, Message = "Đang tải màn chơi..." }).Forget();
             await EventBus.Publish(new LoadEntryScene());
 
-            EventBus.Publish(new BootProgress { Value = 1f, Message = "Hoàn tất" });
-            EventBus.Publish(new BootCompleted());
+            EventBus.Publish(new BootProgress { Value = 1f, Message = "Hoàn tất" }).Forget();
+            EventBus.Publish(new BootCompleted()).Forget();
 
             if (debug) Debug.Log("[VahTyah] Boot complete.");
         }
 
-        private async Task InitModules(bool debug)
+        private async UniTask InitModules(bool debug)
         {
             Module[] modules = Config != null
                 ? Config.Modules.Where(m => m != null).ToArray()
@@ -38,7 +38,7 @@ namespace VahTyah
                 return;
             }
 
-            EventBus.Publish(new BootProgress { Value = 0f, Message = "Đang khởi tạo..." });
+            EventBus.Publish(new BootProgress { Value = 0f, Message = "Đang khởi tạo..." }).Forget();
 
             int total = modules.Length;
 
@@ -56,7 +56,7 @@ namespace VahTyah
                     Debug.LogError($"[VahTyah] {m.name} boot failed: {e.Message}\n{e.StackTrace}");
                 }
 
-                EventBus.Publish(new BootProgress { Value = (i + 1) / (float)total * 0.85f });
+                EventBus.Publish(new BootProgress { Value = (i + 1) / (float)total * 0.85f }).Forget();
             }
         }
 

@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -16,21 +16,21 @@ namespace VahTyah
             _config = config;
         }
 
-        public Task Play(string itemKey, Vector3 start, int value)
+        public UniTask Play(string itemKey, Vector3 start, int value)
         {
             if (!ItemDisplay.TryFind(itemKey, out var targetPos))
-                return Task.CompletedTask;
+                return UniTask.CompletedTask;
 
             var pool = GetOrCreatePool(itemKey);
             if (pool == null)
-                return Task.CompletedTask;
+                return UniTask.CompletedTask;
 
             int count = Mathf.Clamp(value, 1, _config.MaxPoolSize);
             count = Mathf.Min(count, pool.AvailableCount);
             if (count == 0)
-                return Task.CompletedTask;
+                return UniTask.CompletedTask;
 
-            var tcs = new TaskCompletionSource<bool>();
+            var tcs = new UniTaskCompletionSource();
             int remaining = count;
             int perItem = value / count;
             int remainder = value % count;
@@ -61,7 +61,7 @@ namespace VahTyah
                     spawn, ctrl0, ctrl1, targetPos, delay, dur, () =>
                     {
                         remaining--;
-                        if (remaining <= 0) tcs.TrySetResult(true);
+                        if (remaining <= 0) tcs.TrySetResult();
                     }));
             }
 
@@ -91,7 +91,7 @@ namespace VahTyah
                 yield return null;
             }
 
-            EventBus.Publish(new ItemCommitPending { Key = itemKey, Value = itemValue });
+            EventBus.Publish(new ItemCommitPending { Key = itemKey, Value = itemValue }).Forget();
             pool.Release(rt);
             onDone?.Invoke();
         }

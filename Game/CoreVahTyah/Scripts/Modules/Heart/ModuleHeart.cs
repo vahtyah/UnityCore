@@ -1,6 +1,6 @@
 using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -16,7 +16,7 @@ namespace VahTyah
 
         private HeartSaveData _save;
 
-        public override Task InitializeAsync(Transform holder)
+        public override UniTask InitializeAsync(Transform holder)
         {
             _save = Services.Get<SaveService>().Load<HeartSaveData>(SaveKey);
 
@@ -33,7 +33,7 @@ namespace VahTyah
             go.hideFlags = HideFlags.HideInHierarchy;
             go.AddComponent<HeartTicker>().Initialize(this);
 
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         public override void Subscribe()
@@ -59,7 +59,7 @@ namespace VahTyah
             else
                 Persist();
 
-            EventBus.Publish(new HeartChanged());
+            EventBus.Publish(new HeartChanged()).Forget();
         }
 
         private void OnUse(HeartUse e)
@@ -78,7 +78,7 @@ namespace VahTyah
             else
                 Persist();
 
-            EventBus.Publish(new HeartChanged());
+            EventBus.Publish(new HeartChanged()).Forget();
             e.Reply?.Invoke(true);
         }
 
@@ -95,7 +95,7 @@ namespace VahTyah
                 .ToBinary();
 
             Persist();
-            EventBus.Publish(new HeartInfinityChanged());
+            EventBus.Publish(new HeartInfinityChanged()).Forget();
         }
 
         internal void TryRegenerate()
@@ -111,7 +111,7 @@ namespace VahTyah
             {
                 _save.Hearts = Mathf.Min(_save.Hearts + gained, MaxHearts);
                 UpdateTimestamps();
-                EventBus.Publish(new HeartChanged());
+                EventBus.Publish(new HeartChanged()).Forget();
             }
         }
 

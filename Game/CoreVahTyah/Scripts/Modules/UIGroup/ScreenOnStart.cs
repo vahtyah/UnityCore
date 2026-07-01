@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -10,6 +11,6 @@ namespace VahTyah
     {
         [SerializeField] private UIGroupId _screen = UIGroupId.Gameplay;
 
-        private void Start() => EventBus.Publish(new ScreenRequest { Screen = _screen });
+        private void Start() => EventBus.Publish(new ScreenRequest { Screen = _screen }).Forget();
     }
 }

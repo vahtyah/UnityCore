@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -20,12 +20,12 @@ namespace VahTyah
         [Tooltip("-1 = NeverSleep (màn hình không tự tắt).")]
         [SerializeField] private int _sleepTimeout = SleepTimeout.NeverSleep;
 
-        public override Task InitializeAsync(Transform holder)
+        public override UniTask InitializeAsync(Transform holder)
         {
             QualitySettings.vSyncCount = _vSyncCount;
             Screen.sleepTimeout = _sleepTimeout;
             Application.targetFrameRate = ResolveFrameRate();
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         private int ResolveFrameRate()

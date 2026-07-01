@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -18,7 +18,7 @@ namespace VahTyah
         private MusicSaveData _save;
         private readonly Dictionary<int, AudioClip> _byId = new Dictionary<int, AudioClip>();
 
-        public override Task InitializeAsync(Transform holder)
+        public override UniTask InitializeAsync(Transform holder)
         {
             _save = Services.Get<SaveService>().Load<MusicSaveData>(SaveKey);
 
@@ -33,7 +33,7 @@ namespace VahTyah
             _player.Init(_crossfade);
             _player.Configure(_save.Volume, _save.Active);
 
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         public override void Subscribe()
@@ -62,7 +62,7 @@ namespace VahTyah
         private void PersistAndNotify()
         {
             Services.Get<SaveService>().Set(SaveKey, _save);
-            EventBus.Publish(new MusicChanged { Active = _save.Active, Volume = _save.Volume });
+            EventBus.Publish(new MusicChanged { Active = _save.Active, Volume = _save.Volume }).Forget();
         }
     }
 }

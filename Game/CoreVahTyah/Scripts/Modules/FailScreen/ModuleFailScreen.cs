@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -10,12 +10,12 @@ namespace VahTyah
 
         private GameObject _instance;
 
-        public override Task InitializeAsync(Transform holder)
+        public override UniTask InitializeAsync(Transform holder)
         {
             _instance = Object.Instantiate(Prefab, holder);
             _instance.SetActive(false);
 
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         public override void Subscribe()
@@ -29,7 +29,7 @@ namespace VahTyah
             if (!e.ShowScreen) return;
 
             if (e.ShowDelay > 0f)
-                await Task.Delay((int)(e.ShowDelay * 1000f));
+                await UniTask.Delay((int)(e.ShowDelay * 1000f));
 
             _instance.SetActive(true);
         }

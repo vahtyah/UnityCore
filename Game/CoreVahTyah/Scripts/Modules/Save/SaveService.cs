@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -20,7 +20,7 @@ namespace VahTyah
             _providers.Add(provider);
         }
 
-        public async Task InitializeAsync()
+        public async UniTask InitializeAsync()
         {
             foreach (var p in _providers)
             {
@@ -42,7 +42,7 @@ namespace VahTyah
                 Debug.Log($"[Save] Active provider: {_active.Name}");
         }
 
-        public async Task<T> LoadAsync<T>(string key) where T : class, new()
+        public async UniTask<T> LoadAsync<T>(string key) where T : class, new()
         {
             if (_cache.TryGetValue(key, out object cached))
                 return (T)cached;
@@ -82,7 +82,7 @@ namespace VahTyah
             _dirty = true;
         }
 
-        public async Task SaveAsync(string key)
+        public async UniTask SaveAsync(string key)
         {
             if (_active == null || !_cache.TryGetValue(key, out object data))
                 return;
@@ -93,7 +93,7 @@ namespace VahTyah
             await _active.SaveAsync(key, data);
         }
 
-        public async Task SaveAllAsync()
+        public async UniTask SaveAllAsync()
         {
             if (_active == null || !_dirty)
                 return;
@@ -109,7 +109,7 @@ namespace VahTyah
             _dirty = false;
         }
 
-        public async Task DeleteAsync(string key)
+        public async UniTask DeleteAsync(string key)
         {
             _cache.Remove(key);
 

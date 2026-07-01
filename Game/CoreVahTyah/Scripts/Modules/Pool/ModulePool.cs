@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -12,7 +12,7 @@ namespace VahTyah
 
         private PoolService _service;
 
-        public override Task InitializeAsync(Transform holder)
+        public override UniTask InitializeAsync(Transform holder)
         {
             var root = new GameObject("[PoolService]").transform;
             root.SetParent(holder);
@@ -25,7 +25,7 @@ namespace VahTyah
 
             Services.Register(_service);
 
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         public override void Subscribe()

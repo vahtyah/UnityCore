@@ -1,5 +1,5 @@
 using System;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -13,7 +13,7 @@ namespace VahTyah
         private FeatureDefinition[] _sorted;
         private int _pendingIndex = -1;
 
-        public override Task InitializeAsync(Transform holder)
+        public override UniTask InitializeAsync(Transform holder)
         {
             _sorted = BuildSorted();
 
@@ -24,7 +24,7 @@ namespace VahTyah
                 go.SetActive(false);
             }
 
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         public override void Subscribe()
@@ -40,7 +40,7 @@ namespace VahTyah
 
             if (index < 0)
             {
-                EventBus.Publish(new FeatureState { Active = false });
+                EventBus.Publish(new FeatureState { Active = false }).Forget();
                 return;
             }
 
@@ -60,12 +60,12 @@ namespace VahTyah
                 Icon = def.Icon,
                 IconDark = def.IconDark,
                 ConditionText = def.ConditionText
-            });
+            }).Forget();
 
             if (unlocked)
             {
                 _pendingIndex = index;
-                EventBus.Publish(new FeatureUnlocked { Index = index });
+                EventBus.Publish(new FeatureUnlocked { Index = index }).Forget();
             }
         }
 
@@ -79,7 +79,7 @@ namespace VahTyah
 
             int index = _pendingIndex;
             _pendingIndex = -1;
-            EventBus.Publish(new FeaturePendingUnlock { Index = index });
+            EventBus.Publish(new FeaturePendingUnlock { Index = index }).Forget();
             e.Reply?.Invoke(true);
         }
 
@@ -118,7 +118,7 @@ namespace VahTyah
         private static int GetCurrentLevel()
         {
             int level = 0;
-            EventBus.Publish(new LevelGet { Reply = v => level = v });
+            EventBus.Publish(new LevelGet { Reply = v => level = v }).Forget();
             return level;
         }
     }

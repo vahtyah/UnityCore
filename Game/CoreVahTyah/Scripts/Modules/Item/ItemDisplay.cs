@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -61,7 +62,7 @@ namespace VahTyah
         private int GetValue()
         {
             int result = 0;
-            EventBus.Publish(new ItemGet { Key = _itemKey, Reply = v => result = v });
+            EventBus.Publish(new ItemGet { Key = _itemKey, Reply = v => result = v }).Forget();
             return result;
         }
 

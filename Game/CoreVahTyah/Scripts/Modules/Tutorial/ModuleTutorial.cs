@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
@@ -23,10 +23,10 @@ namespace VahTyah
         private GameObject _current;
         private int _currentLevel;
 
-        public override Task InitializeAsync(Transform holder)
+        public override UniTask InitializeAsync(Transform holder)
         {
             _save = Services.Get<SaveService>().Load<TutorialSaveData>(SaveKey);
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         public override void Subscribe()
@@ -38,7 +38,7 @@ namespace VahTyah
         private void OnLevelStarted(LevelStarted e)
         {
             int level = 0;
-            EventBus.Publish(new LevelGet { Reply = v => level = v });
+            EventBus.Publish(new LevelGet { Reply = v => level = v }).Forget();
             TryStart(level);
         }
 
