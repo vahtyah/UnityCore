@@ -1,4 +1,5 @@
-using System.Collections;
+using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -35,11 +36,6 @@ namespace VahTyah
 
         private const float MaxStep = 1f / 30f;
 
-        private float _shown;
-        private float _startTime;
-        private float _introElapsed;
-        private bool _completed;
-        private bool _introDone;
         private GameObject _root;
 
         private void Awake()
@@ -49,68 +45,53 @@ namespace VahTyah
 
             if (_introCurve == null || _introCurve.length == 0)
                 _introCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
-
-            _startTime = Time.realtimeSinceStartup;
             if (_fullWidth <= 0f && _fillRect != null) _fullWidth = _fillRect.rect.width;
-            _shown = 0f;
-            ApplyBar(0f);
             if (_canvasGroup != null) _canvasGroup.alpha = 1f;
+            ApplyBar(0f);
 
-            this.On<BootCompleted>(_ => OnCompleted());
+            RunAsync(this.GetCancellationTokenOnDestroy()).Forget();
         }
 
-        private void Update()
+        private async UniTaskVoid RunAsync(CancellationToken ct)
         {
-            if (_introDone) return;
+            float startTime = Time.realtimeSinceStartup;
+            var bootCompleted = EventBus.WaitFor<BootCompleted>();
 
-            _introElapsed += Mathf.Min(Time.unscaledDeltaTime, MaxStep);
-            float t = Mathf.Clamp01(_introElapsed / _introDuration);
-            _shown = _introTarget * _introCurve.Evaluate(t);
-
-            if (t >= 1f)
+            float elapsed = 0f;
+            while (elapsed < _introDuration)
             {
-                _shown = _introTarget;
-                _introDone = true;
-                EventBus.Publish(new BootIntroReady()).Forget();
+                elapsed += Mathf.Min(Time.unscaledDeltaTime, MaxStep);
+                ApplyBar(_introTarget * _introCurve.Evaluate(Mathf.Clamp01(elapsed / _introDuration)));
+                await UniTask.Yield(ct);
             }
+            ApplyBar(_introTarget);
+            EventBus.Publish(new BootIntroReady()).Forget();
 
-            ApplyBar(_shown);
-        }
+            await bootCompleted;
 
-        private void OnCompleted()
-        {
-            if (_completed) return;
-            _completed = true;
-            StartCoroutine(FinishRoutine());
-        }
+            float remain = _minLoadingTime - (Time.realtimeSinceStartup - startTime);
+            if (remain > 0f)
+                await UniTask.Delay(TimeSpan.FromSeconds(remain), DelayType.Realtime, cancellationToken: ct);
 
-        private IEnumerator FinishRoutine()
-        {
-            _introDone = true;
-
-            float elapsed = Time.realtimeSinceStartup - _startTime;
-            if (elapsed < _minLoadingTime)
-                yield return new WaitForSecondsRealtime(_minLoadingTime - elapsed);
-
-            while (_shown < 0.999f)
+            float shown = _introTarget;
+            while (shown < 0.999f)
             {
                 float k = 1f - Mathf.Exp(-_fillSpeed * Mathf.Min(Time.unscaledDeltaTime, MaxStep));
-                _shown = Mathf.Lerp(_shown, 1f, k);
-                ApplyBar(_shown);
-                yield return null;
+                shown = Mathf.Lerp(shown, 1f, k);
+                ApplyBar(shown);
+                await UniTask.Yield(ct);
             }
-            _shown = 1f;
             ApplyBar(1f);
 
             if (_canvasGroup != null)
             {
-                float start = _canvasGroup.alpha;
+                float from = _canvasGroup.alpha;
                 float t = 0f;
                 while (t < _fadeDuration)
                 {
                     t += Time.unscaledDeltaTime;
-                    _canvasGroup.alpha = Mathf.Lerp(start, 0f, t / _fadeDuration);
-                    yield return null;
+                    _canvasGroup.alpha = Mathf.Lerp(from, 0f, t / _fadeDuration);
+                    await UniTask.Yield(ct);
                 }
                 _canvasGroup.alpha = 0f;
             }

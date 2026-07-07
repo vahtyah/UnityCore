@@ -12,16 +12,13 @@ namespace VahTyah
 
         public override void Subscribe()
         {
+            EventBus.On<BootIntroReady>(OnBootIntroReady);
             EventBus.OnAsync<SceneLoadRequest>(HandleSceneLoad, -10);
-            EventBus.OnAsync<LoadEntryScene>(HandleEntryScene, -10);
         }
 
-        // Bootstrap gọi 1 lần sau khi mọi module sẵn sàng. SceneLoader tự quyết index.
-        private UniTask HandleEntryScene(LoadEntryScene _)
+        private void OnBootIntroReady(BootIntroReady _)
         {
-            int index = SceneRedirect.OverrideSceneIndex;   // editor: scene đang test
-            if (index < 0) index = EntrySceneIndex;          // mặc định
-            return EventBus.Publish(new SceneLoadRequest { Index = index });
+            EventBus.Publish(new SceneLoadRequest { Index = EntrySceneIndex }).Forget();
         }
 
         private async UniTask HandleSceneLoad(SceneLoadRequest e)

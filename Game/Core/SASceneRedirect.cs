@@ -9,11 +9,11 @@ namespace StandardAssets
     /// </summary>
     public static class SASceneRedirect
     {
-        [RuntimeInitializeOnLoadMethod]
+        /*[RuntimeInitializeOnLoadMethod]
         private static void Init()
         {
             if (SceneManager.GetActiveScene().buildIndex != 0)
                 SceneManager.LoadScene(0);
-        }
+        }*/
     }
 }

@@ -23,8 +23,6 @@ namespace VahTyah
 
             await introReady;
 
-            await EventBus.Publish(new LoadEntryScene());
-
             EventBus.Publish(new BootCompleted()).Forget();
 
             if (debug) Debug.Log("[VahTyah] Boot complete.");
