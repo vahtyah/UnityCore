@@ -318,7 +318,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1897838857}
   - component: {fileID: 1897838858}
-  - component: {fileID: 1897838859}
   m_Layer: 0
   m_Name: Test
   m_TagString: Untagged
@@ -350,22 +349,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1897838856}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81e53b0200ac5bc4193b823b39e9c8ed, type: 3}
+  m_Script: {fileID: 11500000, guid: a17ca06f98ac840429b4b82e4fcb6745, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::StandardAssets.Tests.SATypedBusSmokeTest
---- !u!114 &1897838859
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1897838856}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ebb31887e1ebb9c499083272f10816bf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ScreenOnStart
-  _screen: 2
+  m_EditorClassIdentifier: Assembly-CSharp::ModuleTestGUI
+  _referenceWidth: 1080
+  _visible: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using VahTyah;
 #if UNITY_EDITOR && VAHTYAH_CUSTOM_INSPECTOR
 using VahTyah.Inspector;
 #endif
@@ -9,6 +10,15 @@ public class LevelManager : MonoBehaviour
 {
     [SerializeField] private Spawner[] spawners;
 
+    private void Awake()
+    {
+        this.On<LevelLoadRequest>(OnLevelLoadRequest);
+    }
+
+    private void OnLevelLoadRequest(LevelLoadRequest obj)
+    {
+        //LoadLevel();
+    }
 
     public void Initialize()
     {

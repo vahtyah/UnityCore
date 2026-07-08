@@ -55,14 +55,12 @@ namespace VahTyah
         private void SpawnDisplay(Transform holder)
         {
             if (_displayPrefab == null) return;
-
-            // Spawn 1 lần, sống xuyên scene (theo holder = Bootstrap/DontDestroyOnLoad).
-            // Ẩn/hiện theo màn do UIGroup gắn sẵn trên prefab tự lo (nếu có).
             _displayInstance = Instantiate(_displayPrefab, holder);
         }
 
         public override void Subscribe()
         {
+            EventBus.On<SceneLoaded>(OnSceneLoaded);
             EventBus.On<LevelCompleted>(OnCompleted);
             EventBus.On<LevelStarted>(OnStarted);
             EventBus.On<LevelSet>(OnSet);
@@ -70,6 +68,11 @@ namespace VahTyah
             EventBus.On<LevelGetIndex>(e => e.Reply?.Invoke(LevelIndex));
             EventBus.On<LevelGetTries>(e => e.Reply?.Invoke(_save.Tries));
             EventBus.On<TransitionRequest>(OnTransition, -10);
+        }
+
+        private void OnSceneLoaded(SceneLoaded obj)
+        {
+            if(obj.Index == 1) EventBus.Publish(new LevelLoadRequest());
         }
 
         private void OnCompleted(LevelCompleted e)

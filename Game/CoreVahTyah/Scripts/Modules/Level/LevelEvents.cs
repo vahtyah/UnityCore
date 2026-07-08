@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace VahTyah
 {
+    public struct LevelLoadRequest : IEvent {}
     public struct LevelStarted : IEvent { public Dictionary<string, object> Extra; }
     public struct LevelCompleted : IEvent { public bool ShowScreen; public float ShowDelay; public Dictionary<string, object> Extra; }
     public struct LevelFailed : IEvent { public bool ShowScreen; public float ShowDelay; public Dictionary<string, object> Extra; }
