@@ -8,7 +8,6 @@ namespace VahTyah
 {
     public class LoadingScreen : MonoBehaviour
     {
-        [SerializeField] private CanvasGroup _canvasGroup;
         [Tooltip("RectTransform của thanh fill (Image Sliced). Bar chạy bằng cách đổi WIDTH — anchor ngang cố định, không stretch.")]
         [SerializeField] private RectTransform _fillRect;
         [SerializeField] private TMP_Text _percentText;
@@ -24,8 +23,10 @@ namespace VahTyah
                  "Đường thẳng = linear; EaseInOut = mượt hai đầu; kéo cong Y để đổi cảm giác (ease-out, overshoot...).")]
         [SerializeField] private AnimationCurve _introCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
+        [SerializeField] private float waitIntroDuration = 0.1f;
+        
+
         [Header("Animation")]
-        [SerializeField] private float _fadeDuration = 0.5f;
         [Tooltip("Thời gian loading tối thiểu (giây) trước khi fade — tránh chớp màn khi boot quá nhanh. 0 = không giữ.")]
         [SerializeField] private float _minLoadingTime = 1.5f;
         [Tooltip("Hằng số smoothing cho fill đoạn cuối (_introTarget → 100%), ease-out kiểu lerp. " +
@@ -43,19 +44,24 @@ namespace VahTyah
             _root = transform.root.gameObject;
             DontDestroyOnLoad(_root);
 
+            this.On<TransitionRequest>(OnTransitionRequest);
+
             if (_introCurve == null || _introCurve.length == 0)
                 _introCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
             if (_fullWidth <= 0f && _fillRect != null) _fullWidth = _fillRect.rect.width;
-            if (_canvasGroup != null) _canvasGroup.alpha = 1f;
             ApplyBar(0f);
 
             RunAsync(this.GetCancellationTokenOnDestroy()).Forget();
         }
 
+        private void OnTransitionRequest(TransitionRequest obj)
+        {
+            if(!obj.Cover) Destroy(_root);
+        }
+
         private async UniTaskVoid RunAsync(CancellationToken ct)
         {
             float startTime = Time.realtimeSinceStartup;
-            var bootCompleted = EventBus.WaitFor<BootCompleted>();
 
             float elapsed = 0f;
             while (elapsed < _introDuration)
@@ -65,9 +71,8 @@ namespace VahTyah
                 await UniTask.Yield(ct);
             }
             ApplyBar(_introTarget);
-            EventBus.Publish(new BootIntroReady()).Forget();
 
-            await bootCompleted;
+            await UniTask.WaitForSeconds(waitIntroDuration, cancellationToken: ct);
 
             float remain = _minLoadingTime - (Time.realtimeSinceStartup - startTime);
             if (remain > 0f)
@@ -83,20 +88,8 @@ namespace VahTyah
             }
             ApplyBar(1f);
 
-            if (_canvasGroup != null)
-            {
-                float from = _canvasGroup.alpha;
-                float t = 0f;
-                while (t < _fadeDuration)
-                {
-                    t += Time.unscaledDeltaTime;
-                    _canvasGroup.alpha = Mathf.Lerp(from, 0f, t / _fadeDuration);
-                    await UniTask.Yield(ct);
-                }
-                _canvasGroup.alpha = 0f;
-            }
-
-            Destroy(_root);
+            
+            EventBus.Publish(new BootIntroCompleted()).Forget();
         }
 
         private void ApplyBar(float t)

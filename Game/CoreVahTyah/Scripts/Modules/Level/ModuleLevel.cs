@@ -21,8 +21,19 @@ namespace VahTyah
 
         private LevelSaveData _save;
         private GameObject _displayInstance;
+        private List<int> _loopPool;
 
-        public static int Current { get; private set; } = 1;
+        // Loop pool chỉ phụ thuộc _config (cố định lúc runtime) → build 1 lần, cache lại.
+        private List<int> LoopPool
+        {
+            get
+            {
+                if (_loopPool == null) _loopPool = BuildLoopPool();
+                return _loopPool;
+            }
+        }
+
+        public int Current { get; private set; } = 1;
 
         public int LevelIndex
         {
@@ -34,7 +45,7 @@ namespace VahTyah
                 if (Current <= _config.TotalLevels)
                     return Mathf.Min(Current - 1, _config.TotalLevels - 1);
 
-                List<int> pool = GetLoopPool();
+                List<int> pool = LoopPool;
                 if (pool.Count == 0)
                     return _config.TotalLevels - 1;
 
@@ -95,8 +106,9 @@ namespace VahTyah
         {
             _save.Level = Mathf.Max(1, e.Level);
             _save.Tries = 0;
+            Current = _save.Level; // #1: sync ngay để display + LevelIndex phản ánh đúng level vừa set
             Persist();
-            EventBus.Publish(new LevelChanged { Level = _save.Level }).Forget();
+            EventBus.Publish(new LevelChanged()).Forget();
         }
 
         private void OnTransition(TransitionRequest e)
@@ -111,7 +123,7 @@ namespace VahTyah
             _save.Level++;
             _save.Tries = 0;
             Persist();
-            EventBus.Publish(new LevelChanged { Level = _save.Level }).Forget();
+            EventBus.Publish(new LevelChanged()).Forget();
         }
 
         private void Persist()
@@ -120,7 +132,7 @@ namespace VahTyah
             save.Set(SaveKey, _save);
         }
 
-        private List<int> GetLoopPool()
+        private List<int> BuildLoopPool()
         {
             var pool = new List<int>();
             for (int i = 0; i < _config.TotalLevels; i++)
@@ -144,6 +156,7 @@ namespace VahTyah
                 r.From = Mathf.Max(1, r.From);
                 r.To = Mathf.Max(r.From, r.To);
             }
+            _loopPool = null; // config đổi trong Editor → build lại pool ở lần đọc kế
         }
     }
 }

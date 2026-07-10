@@ -12,11 +12,11 @@ namespace VahTyah
 
         public override void Subscribe()
         {
-            EventBus.On<BootIntroReady>(OnBootIntroReady);
+            EventBus.On<BootIntroCompleted>(OnBootIntroReady);
             EventBus.OnAsync<SceneLoadRequest>(HandleSceneLoad, -10);
         }
 
-        private void OnBootIntroReady(BootIntroReady _)
+        private void OnBootIntroReady(BootIntroCompleted _)
         {
             EventBus.Publish(new SceneLoadRequest { Index = EntrySceneIndex }).Forget();
         }

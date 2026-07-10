@@ -1,4 +1,4 @@
-using System.Collections;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,6 +11,7 @@ namespace VahTyah
         private CanvasGroup _canvasGroup;
         private Image _image;
         private float _fadeDuration;
+        private float _holdDuration;
         private Color _baseColor;
 
         public void InitWithAnimator(Animator animator)
@@ -18,14 +19,15 @@ namespace VahTyah
             _animator = animator;
         }
 
-        public void InitFallback(Color color, float duration)
+        public void InitFallback(Color color, float duration, float holdDuration)
         {
             _baseColor = color;
             _fadeDuration = duration;
+            _holdDuration = holdDuration;
 
             var canvas = gameObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 9999;
+            canvas.sortingOrder = 999;
             gameObject.AddComponent<CanvasScaler>();
             gameObject.AddComponent<GraphicRaycaster>();
 
@@ -49,31 +51,22 @@ namespace VahTyah
 
         public UniTask PlayAsync(bool cover, Sprite sprite)
         {
-            var tcs = new UniTaskCompletionSource();
-
-            if (_animator != null)
-                StartCoroutine(AnimatorRoutine(cover, tcs));
-            else
-                StartCoroutine(FadeRoutine(cover, sprite, tcs));
-
-            return tcs.Task;
+            var ct = this.GetCancellationTokenOnDestroy();
+            return _animator != null
+                ? AnimatorRoutine(cover, ct)
+                : FadeRoutine(cover, sprite, ct);
         }
 
-        private IEnumerator AnimatorRoutine(bool cover, UniTaskCompletionSource tcs)
+        private async UniTask AnimatorRoutine(bool cover, CancellationToken ct)
         {
             _animator.SetBool("transition", cover);
-            yield return null;
+            await UniTask.Yield(ct);
 
-            while (_animator.IsInTransition(0))
-                yield return null;
-
-            while (_animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f)
-                yield return null;
-
-            tcs.TrySetResult();
+            await UniTask.WaitWhile(() => _animator.IsInTransition(0), cancellationToken: ct);
+            await UniTask.WaitWhile(() => _animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f, cancellationToken: ct);
         }
 
-        private IEnumerator FadeRoutine(bool cover, Sprite sprite, UniTaskCompletionSource tcs)
+        private async UniTask FadeRoutine(bool cover, Sprite sprite, CancellationToken ct)
         {
             if (sprite != null)
             {
@@ -96,12 +89,14 @@ namespace VahTyah
             {
                 elapsed += Time.deltaTime;
                 _canvasGroup.alpha = Mathf.Lerp(from, to, elapsed / _fadeDuration);
-                yield return null;
+                await UniTask.Yield(ct);
             }
 
             _canvasGroup.alpha = to;
             _canvasGroup.blocksRaycasts = cover;
-            tcs.TrySetResult();
+            
+            if (cover && _holdDuration > 0f)
+                await UniTask.WaitForSeconds(_holdDuration, ignoreTimeScale: true, cancellationToken: ct); // giữ đen trước khi vén
         }
     }
 }

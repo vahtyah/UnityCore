@@ -10,6 +10,8 @@ namespace VahTyah
 
         [Header("Fallback (không có prefab)")]
         [SerializeField] private float _fadeDuration = 0.3f;
+        [Tooltip("Giữ màn đen bao lâu (giây) TRƯỚC khi vén (uncover). 0 = không giữ.")]
+        [SerializeField] private float _holdDuration = 0f;
         [SerializeField] private Sprite _sprite;
         [SerializeField] private Color _fadeColor = Color.black;
 
@@ -30,7 +32,7 @@ namespace VahTyah
             }
             else
             {
-                _controller.InitFallback(_fadeColor, _fadeDuration);
+                _controller.InitFallback(_fadeColor, _fadeDuration, _holdDuration);
             }
 
             return UniTask.CompletedTask;

@@ -1,5 +1,5 @@
 namespace VahTyah
 {
-    public struct BootIntroReady : IEvent { }
+    public struct BootIntroCompleted : IEvent { }
     public struct BootCompleted : IEvent { }
 }

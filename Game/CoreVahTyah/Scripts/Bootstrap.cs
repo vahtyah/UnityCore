@@ -17,7 +17,7 @@ namespace VahTyah
 
             bool debug = Config != null && Config.DebugLogs;
 
-            var introReady = EventBus.WaitFor<BootIntroReady>();
+            var introReady = EventBus.WaitFor<BootIntroCompleted>();
 
             await InitModules(debug);
 
