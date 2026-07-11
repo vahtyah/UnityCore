@@ -17,5 +17,4 @@ MonoBehaviour:
     NonLoopLevels: []
   _enableTestLevel: 0
   _testLevel: 1
-  _displayPrefab: {fileID: 7309219342110356448, guid: 66e3b00b694068e47a18c3a94bcea0b8, type: 3}
-  _displayGroup: -1
+  _displayPrefab: {fileID: 6285704383643877808, guid: 7766500426e3f4b0b846c59ec2ec658b, type: 3}

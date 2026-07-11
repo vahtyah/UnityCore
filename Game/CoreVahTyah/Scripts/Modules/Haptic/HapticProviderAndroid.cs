@@ -6,7 +6,7 @@ namespace VahTyah
     /// Android Vibrator, SDK-aware: ≥26 dùng VibrationEffect (createOneShot/createWaveform có amplitude),
     /// cũ hơn fallback vibrate(long)/vibrate(long[],-1). Scale theo intensity.
     /// </summary>
-    public sealed class HapticProviderAndroid : IHapticProvider
+    public sealed class HapticProviderAndroid : IHapticProvider, IHapticTunable
     {
         private static readonly long[] T_Success = { 0, 30, 40, 60 };
         private static readonly int[] A_Success = { 0, 150, 0, 200 };
@@ -16,14 +16,39 @@ namespace VahTyah
         private static readonly int[] A_Failure = { 0, 255, 0, 200, 0, 200 };
 
         private readonly float _intensity;
+        private HapticOneShot _light, _medium, _heavy;
         private AndroidJavaObject _vibrator;
         private int _sdk;
         private bool _ready;
 
-        public HapticProviderAndroid(float intensity)
+        public HapticProviderAndroid(float intensity, HapticOneShot light, HapticOneShot medium, HapticOneShot heavy)
         {
             _intensity = Mathf.Clamp(intensity, 0f, 2f);
+            _light = light;
+            _medium = medium;
+            _heavy = heavy;
             Init();
+        }
+
+        public bool TryGetOneShot(HapticType type, out HapticOneShot cfg)
+        {
+            switch (type)
+            {
+                case HapticType.Light: cfg = _light; return true;
+                case HapticType.Medium: cfg = _medium; return true;
+                case HapticType.Heavy: cfg = _heavy; return true;
+                default: cfg = default; return false;
+            }
+        }
+
+        public void SetOneShot(HapticType type, HapticOneShot cfg)
+        {
+            switch (type)
+            {
+                case HapticType.Light: _light = cfg; break;
+                case HapticType.Medium: _medium = cfg; break;
+                case HapticType.Heavy: _heavy = cfg; break;
+            }
         }
 
         private void Init()
@@ -39,6 +64,9 @@ namespace VahTyah
                 _sdk = ver.GetStatic<int>("SDK_INT");
 
                 _ready = _vibrator != null;
+
+                bool hasAmp = _sdk >= 26 && _ready && _vibrator.Call<bool>("hasAmplitudeControl");
+                Debug.Log($"[Haptic] Android init: sdk={_sdk}, ready={_ready}, hasAmplitudeControl={hasAmp}");
             }
             catch (System.Exception e)
             {
@@ -73,10 +101,13 @@ namespace VahTyah
 #if UNITY_ANDROID
         private int OneShot(HapticType type)
         {
-            int ms = type switch { HapticType.Light => 15, HapticType.Medium => 30, HapticType.Heavy => 60, _ => 30 };
-            int amp = type switch { HapticType.Light => 80, HapticType.Medium => 150, HapticType.Heavy => 255, _ => 150 };
-            amp = Mathf.Clamp(Mathf.RoundToInt(amp * _intensity), 1, 255);
+            // Số ms/amp lấy từ ModuleHaptic (Inspector) → tune mạnh/nhẹ không cần sửa code.
+            var cfg = type switch { HapticType.Light => _light, HapticType.Medium => _medium, HapticType.Heavy => _heavy, _ => _medium };
+            int ms = Mathf.Max(1, cfg.DurationMs);
+            int amp = Mathf.Clamp(Mathf.RoundToInt(cfg.Amplitude * _intensity), 1, 255);
 
+            // Luôn one-shot: máy CÓ amplitude control thì amp có tác dụng; máy KHÔNG có thì amp bị bỏ qua
+            // nhưng DurationMs vẫn là đòn bẩy (rung dài hơn = cảm giác mạnh hơn).
             if (_sdk >= 26)
             {
                 using var fx = new AndroidJavaClass("android.os.VibrationEffect");

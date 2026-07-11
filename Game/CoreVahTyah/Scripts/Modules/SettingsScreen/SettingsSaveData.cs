@@ -8,5 +8,6 @@ namespace VahTyah
         public bool Sound = true;
         public bool Sfx = true;
         public bool Haptics = true;
+        public float MusicVolume = 1f;
     }
 }

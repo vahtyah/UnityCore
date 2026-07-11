@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace VahTyah
 {
@@ -15,6 +15,7 @@ namespace VahTyah
         public bool Sound => _data.Sound;
         public bool Sfx => _data.Sfx;
         public bool Haptics => _data.Haptics;
+        public float MusicVolume => _data.MusicVolume;
 
         public async UniTask InitAsync() => _data = await _save.LoadAsync<SettingsSaveData>(SaveKey);
 
@@ -37,6 +38,14 @@ namespace VahTyah
             if (_data.Haptics == on) return;
             _data.Haptics = on;
             Persist();
+        }
+
+        public void SetMusicVolume(float volume)
+        {
+            volume = Mathf.Clamp01(volume);
+            if (Mathf.Approximately(_data.MusicVolume, volume)) return;
+            _data.MusicVolume = volume;
+            _save.Set(SaveKey, _data); // volume không phải toggle → chỉ lưu, không publish SettingsChanged
         }
 
         private void Persist()

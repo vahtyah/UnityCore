@@ -1,8 +1,25 @@
+using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VahTyah
 {
+    /// <summary>Cấu hình rung 1 loại (Android). DurationMs &lt;~25ms nhiều máy không cảm nhận được.</summary>
+    [Serializable]
+    public struct HapticOneShot
+    {
+        [Tooltip("Độ dài rung (ms). Dưới ~25ms nhiều máy Android không cảm nhận được.")]
+        public int DurationMs;
+
+        [Range(1, 255)]
+        [Tooltip("Cường độ 1-255. Chỉ có tác dụng khi máy CÓ amplitude control; máy không có thì chỉ DurationMs điều khiển được.")]
+        public int Amplitude;
+    }
+
+    /// <summary>
+    /// Dựng provider theo nền tảng + đăng ký <see cref="HapticService"/> vào Services.
+    /// Boot SAU ModuleSave và ModuleSettingsScreen (service cần <see cref="SettingsService"/> để đọc cờ bật/tắt).
+    /// </summary>
     [CreateAssetMenu(menuName = "VahTyah/Modules/Haptic", fileName = "Module_Haptic")]
     public sealed class ModuleHaptic : Module
     {
@@ -15,22 +32,20 @@ namespace VahTyah
         [SerializeField] private int _cooldownMs = 80;
 
         [Header("Android")]
-        [Tooltip("Cường độ rung Android. 0 = tắt, 1 = thường, 2 = mạnh gấp đôi.")]
+        [Tooltip("Cường độ rung Android tổng. 0 = tắt, 1 = thường, 2 = mạnh gấp đôi. Nhân với Amplitude từng loại.")]
         [Range(0f, 2f)]
         [SerializeField] private float _androidIntensity = 1f;
 
-        private const string SaveKey = "haptic";
-
-        private IHapticProvider _provider;
-        private HapticSaveData _save;
-        private float _lastPlay = float.MinValue;
-
-        private bool Active => _save == null || _save.Active;
+        [Header("Android - cường độ từng loại (khi máy có amplitude control)")]
+        [SerializeField] private HapticOneShot _light = new HapticOneShot { DurationMs = 35, Amplitude = 200 };
+        [SerializeField] private HapticOneShot _medium = new HapticOneShot { DurationMs = 45, Amplitude = 230 };
+        [SerializeField] private HapticOneShot _heavy = new HapticOneShot { DurationMs = 60, Amplitude = 255 };
 
         public override UniTask InitializeAsync(Transform holder)
         {
-            _save = Services.Get<SaveService>().Load<HapticSaveData>(SaveKey);
-            _provider = CreateProvider();
+            Services.TryGet<SettingsService>(out var settings); // null trong editor/partial boot → coi như bật
+            var provider = CreateProvider();
+            Services.Register(new HapticService(provider, settings, _gapMs, _cooldownMs));
             return UniTask.CompletedTask;
         }
 
@@ -41,57 +56,10 @@ namespace VahTyah
 #elif UNITY_IOS
             return HapticNativeRegistry.IOSProvider ?? new HapticProviderIOS();
 #elif UNITY_ANDROID
-            return new HapticProviderAndroid(_androidIntensity);
+            return new HapticProviderAndroid(_androidIntensity, _light, _medium, _heavy);
 #else
             return new HapticProviderDefault();
 #endif
-        }
-
-        public override void Subscribe()
-        {
-            EventBus.On<HapticPlay>(OnPlay);
-            EventBus.OnAsync<HapticSequence>(OnSequence);
-            EventBus.On<HapticSetActive>(OnSetActive);
-            EventBus.On<HapticGet>(e => e.Reply?.Invoke(Active));
-        }
-
-        private void OnPlay(HapticPlay e)
-        {
-            if (!CanPlay(e.Force)) return;
-            _provider.Play(e.Type);
-        }
-
-        private async UniTask OnSequence(HapticSequence e)
-        {
-            if (e.Types == null || e.Types.Length == 0) return;
-            if (!CanPlay(e.Force)) return;
-
-            for (int i = 0; i < e.Types.Length; i++)
-            {
-                int ms = _provider.Play(e.Types[i]);
-                if (i < e.Types.Length - 1)
-                    await UniTask.Delay(ms + _gapMs);
-            }
-        }
-
-        private void OnSetActive(HapticSetActive e)
-        {
-            _save.Active = e.Active;
-            Services.Get<SaveService>().Set(SaveKey, _save);
-            EventBus.Publish(new HapticChanged { Active = e.Active }).Forget();
-        }
-
-        // Active chặn trước; Force chỉ bỏ qua cooldown (không ghi đè user tắt haptic).
-        private bool CanPlay(bool force)
-        {
-            if (!Active) return false;
-
-            float now = Time.realtimeSinceStartup;
-            if (!force && _cooldownMs > 0 && (now - _lastPlay) * 1000f < _cooldownMs)
-                return false;
-
-            _lastPlay = now;
-            return true;
         }
     }
 }

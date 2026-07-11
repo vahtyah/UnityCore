@@ -82,24 +82,27 @@ API surface để module giao tiếp. Tất cả là `struct : IEvent`. Publish 
 | `FeaturePendingUnlock` | Notify | `int Index` | Có unlock đang chờ show |
 | `FeatureConsumePending` | Query | `Action<bool> Reply` | Lấy + clear pending unlock |
 
-## Sound / Music / Particle / Haptic
+## Particle
 
 | Event | Loại | Field | Ghi chú |
 |-------|------|-------|---------|
-| `SoundPlay` | Cmd | `SoundId Id; float Volume; float Pitch` | SFX one-shot; `<=0`→ mặc định 1. Có cooldown per-id |
-| `MusicPlay` | Cmd | `MusicId Id` | Đổi track (crossfade) |
-| `MusicStop` | Cmd | — | Fade out |
-| `MusicSetVolume` | Cmd | `float Volume` | Set + lưu volume |
-| `MusicSetActive` | Cmd | `bool Active` | Bật/tắt + lưu |
-| `MusicChanged` | Notify | `bool Active; float Volume` | Trạng thái nhạc đổi |
-| `MusicGet` | Query | `Action<bool,float> Reply` | (active, volume) |
 | `ParticlePlay` | Cmd | `ParticleId Id; Vector3 Position` | Spawn particle (world) qua Pool |
 | `ParticlePlayUI` | Cmd | `ParticleId Id; Vector3 Position` | Particle trên UI |
-| `HapticPlay` | Cmd | `HapticType Type; bool Force` | Rung 1 lần; `Force`→ bỏ qua cooldown |
-| `HapticSequence` | Cmd | `HapticType[] Types; bool Force` | Rung tuần tự (async, có gap) |
-| `HapticSetActive` | Cmd | `bool Active` | Bật/tắt + lưu |
-| `HapticChanged` | Notify | `bool Active` | Trạng thái rung đổi |
-| `HapticGet` | Query | `Action<bool> Reply` | Đang bật rung? |
+
+> **Sound / Music / Haptic KHÔNG dùng event** (đổi từ 2026-07). Là command tần suất cao, đúng 1 nơi xử lý → gọi trực tiếp qua service + shortcut tĩnh, không qua EventBus:
+> ```csharp
+> Sound.Play(SoundId.Click);
+> Music.Play(MusicId.Home);  Music.Stop();  Music.SetVolume(0.5f);
+> Haptic.Play(HapticType.Light);  await Haptic.PlaySequence(false, HapticType.Light, HapticType.Heavy);
+> ```
+> Bật/tắt + volume đọc từ `SettingsService` (SSOT). Xem [CONVENTIONS.md](CONVENTIONS.md) → "Command → Service hay Event?" và [MODULES.md](MODULES.md).
+
+## Settings
+
+| Event | Loại | Field | Ghi chú |
+|-------|------|-------|---------|
+| `OpenSettingsRequest` | Cmd | — | Yêu cầu mở popup Settings |
+| `SettingsChanged` | Notify | `bool Sound; bool Sfx; bool Haptics` | Toggle preference đổi; `SettingsService` phát. `MusicService` nghe để mute/unmute BGM ngay (SFX/Haptic gate lúc Play nên không cần nghe) |
 
 ## Tutorial
 
@@ -112,9 +115,12 @@ API surface để module giao tiếp. Tất cả là `struct : IEvent`. Publish 
 ## Ví dụ dùng
 
 ```csharp
-// Command
-EventBus.Publish(new SoundPlay { Id = SoundId.Click }).Forget();
+// Command qua EventBus (cross-module, low-frequency)
 EventBus.Publish(new ScreenRequest { Screen = UIGroupId.Shop }).Forget();
+
+// Command qua Service (hot-path feedback — KHÔNG qua EventBus)
+Sound.Play(SoundId.Click);
+Haptic.Play(HapticType.Light);
 
 // Query (đọc ngay vì sync)
 int hearts = 0;

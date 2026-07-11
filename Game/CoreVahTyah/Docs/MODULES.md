@@ -63,25 +63,33 @@ Mỗi module là 1 `ScriptableObject` asset trong `Config/`, thêm vào `ModuleC
 
 ## Feedback (Audio / Visual / Haptic)
 
+### ModuleSettingsScreen
+- **Menu**: `VahTyah/Modules/SettingsScreen` · **Save key**: `settings` (`SettingsSaveData{Sound, Sfx, Haptics, MusicVolume}`)
+- **Knobs**: `Prefab` (popup, có `SettingsView` + `PopupView`; instantiate 1 lần lúc boot, ẩn sẵn).
+- Register `SettingsService` — **SSOT cho mọi preference audio/haptic**: `Sound` (BGM), `Sfx`, `Haptics`, `MusicVolume`. Mở popup khi `OpenSettingsRequest`; `SettingsView` đọc/ghi qua service, publish `SettingsChanged` khi toggle. **Boot sau `ModuleSave`, trước Sound/Haptic/Music.**
+
+> **Sound/Music/Haptic dùng Service, không dùng event.** Mỗi `Module` là factory register 1 service vào `Services`; gọi qua shortcut tĩnh (`Sound`/`Music`/`Haptic`). Cờ bật/tắt + volume đọc từ `SettingsService` (không lưu riêng). **Phải boot sau `ModuleSettingsScreen`.** Xem [CONVENTIONS.md](CONVENTIONS.md).
+
 ### ModuleSound
-- **Menu**: `VahTyah/Modules/Sound` · **Save key**: — (volume ở đâu tuỳ dự án)
+- **Menu**: `VahTyah/Modules/Sound` · **Save key**: — (cờ SFX ở `settings.Sfx`)
 - **Knobs**: `MasterVolume`, `PoolSize` (số AudioSource, mặc định 4), `CooldownMs` (chống spam per-id, mặc định 60), `Sounds` (List `SoundEntry{Id, Clip(s), Volume, Pitch}`).
-- SFX one-shot, round-robin qua pool AudioSource. Key bằng `(int)SoundId` → tra O(1), reorder list không ảnh hưởng.
+- Register `SoundService`; SFX one-shot round-robin qua pool AudioSource, key `(int)SoundId` → tra O(1). Gate bằng `SettingsService.Sfx` lúc `Play`. Shortcut: `Sound.Play(id, volume, pitch, force)`.
 
 ### ModuleMusic
-- **Menu**: `VahTyah/Modules/Music` · **Save key**: `music` (`MusicSaveData{Active, Volume}`)
+- **Menu**: `VahTyah/Modules/Music` · **Save key**: — (cờ ở `settings.Sound`, volume ở `settings.MusicVolume`)
 - **Knobs**: `_crossfade` (giây, mặc định 0.6), `Tracks` (List `MusicEntry{Id, Clip}`).
-- Nhạc nền có crossfade khi đổi track. Spawn `[MusicPlayer]`.
+- Register `MusicService` + spawn `[MusicPlayer]` (crossfade khi đổi track). Nhạc phát liên tục nên service **nghe `SettingsChanged`** để mute/unmute ngay. Shortcut: `Music.Play(id)`/`Stop()`/`SetVolume(v)`.
 
 ### ModuleParticle
 - **Menu**: `VahTyah/Modules/Particle`
 - **Knobs**: `Effects` (List `ParticleEntry{Id, Prefab, Prewarm}`).
-- Spawn particle qua `Pool`. **Cần ModulePool boot trước** để prewarm (nếu không có sẽ log warning).
+- Spawn particle qua `Pool`. **Cần ModulePool boot trước** để prewarm (nếu không có sẽ log warning). (Particle vẫn dùng event `ParticlePlay`/`ParticlePlayUI`.)
 
 ### ModuleHaptic
-- **Menu**: `VahTyah/Modules/Haptic` · **Save key**: `haptic` (`HapticSaveData{Active}`)
-- **Knobs**: `_gapMs` (nghỉ giữa haptic trong chuỗi), `_cooldownMs` (mặc định 80), `_androidIntensity` (0-2).
-- Provider theo platform: `HapticProviderAndroid` / `HapticProviderIOS` / `HapticProviderDefault` (editor). `Force` bỏ qua cooldown nhưng không ghi đè khi user tắt haptic.
+- **Menu**: `VahTyah/Modules/Haptic` · **Save key**: — (cờ ở `settings.Haptics`)
+- **Knobs**: `_gapMs` (nghỉ giữa haptic trong chuỗi), `_cooldownMs` (mặc định 80), `_androidIntensity` (0-2, scale tổng), `_light/_medium/_heavy` (`HapticOneShot{DurationMs, Amplitude}` — chỉnh mạnh/nhẹ từng loại, **chỉ Android**).
+- Register `HapticService`; provider theo platform: `HapticProviderAndroid` / `HapticProviderIOS` / `HapticProviderDefault` (editor). Gate bằng `SettingsService.Haptics`; `Force` bỏ qua cooldown nhưng không ghi đè khi user tắt. Shortcut: `Haptic.Play(type, force)`/`PlaySequence(force, types)`.
+- **Chỉnh cường độ:** Light/Medium/Heavy tune qua `DurationMs`+`Amplitude` per-type × `_androidIntensity`. `Amplitude` chỉ có tác dụng trên máy có amplitude control (init log `hasAmplitudeControl`); máy không có thì `DurationMs` là đòn bẩy duy nhất. Success/Warning/Failure là waveform cố định. **iOS không tune được** (system feedback). Editor no-op.
 
 ---
 

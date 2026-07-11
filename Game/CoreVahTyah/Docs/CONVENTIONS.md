@@ -43,6 +43,32 @@ EventBus.Publish(new LevelGet { Reply = v => level = v }).Forget();
 ```
 Chỉ đúng khi channel **không có handler async** (sync fast-path). Với module core hiện tại, các query đều là handler sync → an toàn.
 
+## Command → Service hay Event?
+
+Mặc định giao tiếp cross-module đi qua **EventBus** (loose coupling): Level/Heart/Item/Feature/Screen dùng command/notify/query dạng event. Nhưng có **ngoại lệ**: một số command đi qua **Service (gọi trực tiếp)**.
+
+Chọn **Service** (POCO register vào `Services` + shortcut tĩnh) khi CẢ 3 đúng:
+1. Tần suất cao / gọi mỗi tap–mỗi frame (feedback).
+2. Đúng **1 nơi xử lý**, không cần fan-out.
+3. Cần giá trị trả về / await tự nhiên, hoặc muốn stack trace liền mạch.
+
+→ Áp dụng cho **Sound / Music / Haptic**: `Sound.Play`, `Music.Play/Stop/SetVolume`, `Haptic.Play/PlaySequence` gọi thẳng `Services.Get<XService>()`. `ModuleX` chỉ là factory register service.
+
+Chọn **Event** khi: 0..N listener quan tâm, "đã xảy ra" (notify), cần decouple ai phản ứng, hoặc low-frequency. **Đừng** giả lập query bằng event `XGet{Reply=Action<>}` cho các service kiểu này — đọc property trên service.
+
+> **Notify vẫn là Event.** Service phát trạng thái đổi qua EventBus để nơi khác nghe. Ví dụ đổi setting → `SettingsChanged`; `MusicService` (nhạc phát liên tục) nghe event này để mute/unmute ngay, còn SFX/Haptic (one-shot) chỉ gate lúc Play.
+
+## Preference vs Gameplay state — lưu ở đâu
+
+Ranh giới theo **loại dữ liệu**, không theo module:
+
+| Loại | Ví dụ | Lưu ở |
+|------|-------|-------|
+| **User preference** (Settings screen chỉnh) | mute BGM/SFX, haptic on/off, music volume | **chung** → `SettingsService` (SSOT, key `settings`); các service audio/haptic đọc từ đây |
+| **Gameplay state** (tiến trình chơi) | hearts, level, inventory, tutorial done | **riêng** mỗi module (`hearts`/`level`/...) |
+
+Hệ quả: `HapticService/SoundService/MusicService` **không giữ save riêng** — cờ bật/tắt đọc từ `SettingsService`. Vì cache `SettingsService` lúc init, **`ModuleSettingsScreen` phải boot TRƯỚC** Sound/Haptic/Music (và cả 3 sau `ModuleSave`).
+
 ---
 
 ## Cách thêm 1 Module mới
@@ -87,6 +113,7 @@ Ví dụ thêm `ModuleDailyReward`:
 
 ### Checklist thứ tự trong ModuleConfig
 - `ModuleSave` trước mọi module dùng save.
+- `ModuleSettingsScreen` trước `ModuleSound`/`ModuleHaptic`/`ModuleMusic` (các service cache `SettingsService` lúc init).
 - `ModulePool` trước `ModuleParticle` (và bất kỳ module prewarm pool).
 - `ModuleUIGroup` trước khi scene có `UIGroup`/`ScreenOnStart` load.
 

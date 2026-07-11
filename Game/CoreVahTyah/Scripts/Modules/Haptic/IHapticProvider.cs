@@ -8,6 +8,13 @@ namespace VahTyah
         int Play(HapticType type);
     }
 
+    /// <summary>Provider cho phép chỉnh cấu hình one-shot lúc runtime (tune live). Chỉ Android hỗ trợ.</summary>
+    public interface IHapticTunable
+    {
+        bool TryGetOneShot(HapticType type, out HapticOneShot cfg);
+        void SetOneShot(HapticType type, HapticOneShot cfg);
+    }
+
     /// <summary>Điểm gắn provider iOS native tuỳ biến (nếu game muốn override provider mặc định).</summary>
     public static class HapticNativeRegistry
     {

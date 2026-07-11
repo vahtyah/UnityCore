@@ -2,16 +2,16 @@ using Cysharp.Threading.Tasks;
 
 namespace VahTyah
 {
-    /// <summary>Shortcut tĩnh publish event haptic (gõ gọn, không cần biết ModuleHaptic).</summary>
+    /// <summary>Shortcut tĩnh phát haptic — gọi thẳng <see cref="HapticService"/> (không qua EventBus).</summary>
     public static class Haptic
     {
         public static void Play(HapticType type, bool force = false)
-            => EventBus.Publish(new HapticPlay { Type = type, Force = force }).Forget();
+            => Services.Get<HapticService>()?.Play(type, force);
 
-        public static void PlaySequence(bool force, params HapticType[] types)
-            => EventBus.Publish(new HapticSequence { Types = types, Force = force }).Forget();
-
-        public static void SetActive(bool active)
-            => EventBus.Publish(new HapticSetActive { Active = active }).Forget();
+        public static UniTask PlaySequence(bool force, params HapticType[] types)
+        {
+            var service = Services.Get<HapticService>();
+            return service != null ? service.PlaySequence(force, types) : UniTask.CompletedTask;
+        }
     }
 }

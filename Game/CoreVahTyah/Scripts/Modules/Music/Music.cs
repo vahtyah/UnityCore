@@ -1,13 +1,11 @@
-using Cysharp.Threading.Tasks;
-
 namespace VahTyah
 {
-    /// <summary>Shortcut tĩnh publish event nhạc nền.</summary>
+    /// <summary>Shortcut tĩnh điều khiển nhạc nền — gọi thẳng <see cref="MusicService"/> (không qua EventBus).</summary>
     public static class Music
     {
-        public static void Play(MusicId id) => EventBus.Publish(new MusicPlay { Id = id }).Forget();
-        public static void Stop() => EventBus.Publish(new MusicStop()).Forget();
-        public static void SetVolume(float volume) => EventBus.Publish(new MusicSetVolume { Volume = volume }).Forget();
-        public static void SetActive(bool active) => EventBus.Publish(new MusicSetActive { Active = active }).Forget();
+        public static void Play(MusicId id) => Services.Get<MusicService>()?.Play(id);
+        public static void Stop() => Services.Get<MusicService>()?.Stop();
+        public static void SetVolume(float volume) => Services.Get<MusicService>()?.SetVolume(volume);
+        // Bật/tắt BGM: đi qua SettingsService.SetSound (SSOT), không đặt ở đây.
     }
 }

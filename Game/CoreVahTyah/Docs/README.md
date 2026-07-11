@@ -9,8 +9,9 @@ CoreVahTyah là kiến trúc **module hoá + event-driven**. Ba ý cốt lõi:
 1. **Mỗi tính năng = 1 `Module`** (là `ScriptableObject`). Bật/tắt tính năng bằng cách thêm/bớt asset trong `ModuleConfig`, **không đụng code**.
 2. **Module không biết nhau.** Chúng giao tiếp gián tiếp qua `EventBus` (event là `struct : IEvent`). Không có reference trực tiếp giữa các module.
 3. **Phụ thuộc chạy qua 2 kênh:**
-   - `EventBus` — cho lệnh/thông báo/query (loose coupling, mặc định).
-   - `Services` (Service Locator) — cho service cần gọi trực tiếp, tần suất cao (`SaveService`, `PoolService`, `UIGroupService`).
+   - `EventBus` — cho lệnh/thông báo/query cross-module (loose coupling, **mặc định**).
+   - `Services` (Service Locator) — cho service gọi trực tiếp, tần suất cao (`SaveService`, `PoolService`, `UIGroupService`, và feedback `SoundService`/`MusicService`/`HapticService`, `SettingsService`).
+   - Quy tắc chọn kênh: xem [CONVENTIONS.md](CONVENTIONS.md) → "Command → Service hay Event?".
 
 ## Luồng boot (rất quan trọng)
 

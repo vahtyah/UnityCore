@@ -582,10 +582,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e790895557cfe634180554feb547db11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VahTyah.LoadingScreen
-  _canvasGroup: {fileID: 2908059204228355146}
   _fillRect: {fileID: 6439385348320876404}
   _percentText: {fileID: 5977630769480155532}
-  _introDuration: 3
+  _introDuration: 1
   _introTarget: 0.85
   _introCurve:
     serializedVersion: 2
@@ -611,7 +610,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _fadeDuration: 0.5
+  waitIntroDuration: 0.1
   _minLoadingTime: 1.5
   _fillSpeed: 1.5
   _fullWidth: 365
