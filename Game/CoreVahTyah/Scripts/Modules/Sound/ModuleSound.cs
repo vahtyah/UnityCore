@@ -34,56 +34,11 @@ namespace VahTyah
             _byId.Clear();
             foreach (var s in Sounds)
                 _byId[(int)s.Id] = s;
+            
+            Services.TryGet<SettingsService>(out var settings);
+            Services.Register(new SoundService(_pool, Sounds, MasterVolume, CooldownMs, settings));
 
             return UniTask.CompletedTask;
-        }
-
-        public override void Subscribe()
-        {
-            EventBus.On<SoundPlay>(OnPlay);
-        }
-
-        private void OnPlay(SoundPlay e)
-        {
-            if (_pool == null) return;
-
-            int id = (int)e.Id;
-            if (!_byId.TryGetValue(id, out var entry)) return;
-
-            float vol = e.Volume <= 0f ? 1f : e.Volume;   // mặc định 1 nếu không set
-            float pitch = e.Pitch <= 0f ? 1f : e.Pitch;
-
-            if (CooldownMs > 0)
-            {
-                float now = Time.realtimeSinceStartup;
-                if (_lastPlay.TryGetValue(id, out float last) && (now - last) * 1000f < CooldownMs)
-                    return;
-                _lastPlay[id] = now;
-            }
-
-            var clip = entry.GetClip();
-            if (clip == null) return;
-
-            var source = GetSource();
-            source.pitch = entry.Pitch * pitch;
-            source.PlayOneShot(clip, entry.Volume * vol * MasterVolume);
-        }
-
-        private AudioSource GetSource()
-        {
-            for (int i = 0; i < _pool.Length; i++)
-            {
-                int idx = (_poolIndex + i) % _pool.Length;
-                if (!_pool[idx].isPlaying)
-                {
-                    _poolIndex = (idx + 1) % _pool.Length;
-                    return _pool[idx];
-                }
-            }
-
-            var src = _pool[_poolIndex];
-            _poolIndex = (_poolIndex + 1) % _pool.Length;
-            return src;
         }
     }
 }

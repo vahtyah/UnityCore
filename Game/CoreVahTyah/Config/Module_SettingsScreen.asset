@@ -1,0 +1,15 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c178a2560f87dc24c9d5e8d5ccc74d8c, type: 3}
+  m_Name: Module_SettingsScreen
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleSettingsScreen
+  Prefab: {fileID: 2579811782474062895, guid: 93328ac8644b64973a0aaa3520d00418, type: 3}

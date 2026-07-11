@@ -9,10 +9,12 @@ namespace VahTyah
         public GameObject Prefab;
 
         private GameObject _instance;
+        private IPanelView _winView;
 
         public override UniTask InitializeAsync(Transform holder)
         {
             _instance = Object.Instantiate(Prefab, holder);
+            _winView = _instance.GetComponent<IPanelView>();
             _instance.SetActive(false);
 
             return UniTask.CompletedTask;
@@ -21,7 +23,7 @@ namespace VahTyah
         public override void Subscribe()
         {
             EventBus.On<LevelCompleted>(OnCompleted, -100);
-            EventBus.On<SceneLoaded>(OnSceneLoaded, -100);
+            EventBus.On<LevelLoadRequest>(OnLevelLoadRequest);
         }
 
         private async void OnCompleted(LevelCompleted e)
@@ -31,10 +33,10 @@ namespace VahTyah
             if (e.ShowDelay > 0f)
                 await UniTask.Delay((int)(e.ShowDelay * 1000f));
 
-            _instance.SetActive(true);
+            _winView.Show();
         }
 
-        private void OnSceneLoaded(SceneLoaded e)
+        private void OnLevelLoadRequest(LevelLoadRequest e)
         {
             _instance.SetActive(false);
         }
