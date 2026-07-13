@@ -1,11 +1,14 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VahTyah.Inspector;
 
 namespace VahTyah
 {
     [CreateAssetMenu(menuName = "VahTyah/Modules/FailScreen", fileName = "Module_FailScreen")]
     public sealed class ModuleFailScreen : Module
     {
+        [BoxGroup("Screen")]
+        [Required(isError: true)]
         public GameObject Prefab;
 
         private IPanelView _panelView;

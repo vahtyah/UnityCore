@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using VahTyah.Inspector;
 
 namespace VahTyah
 {
     [CreateAssetMenu(menuName = "VahTyah/Modules/Item", fileName = "Module_Item")]
+    [ModuleRequires(typeof(ModuleSave))]
     public sealed class ModuleItem : Module
     {
         [Serializable]
@@ -19,17 +21,16 @@ namespace VahTyah
             public int StartAmount;
         }
 
-        public List<ItemDefinition> Items = new List<ItemDefinition>();
+        [BoxGroup("Items")] public List<ItemDefinition> Items = new List<ItemDefinition>();
 
-        [Header("Animation")]
-        public float SpawnRadius = 120f;
-        public float StaggerDelay = 0.04f;
-        public float Duration = 1f;
-        public float CurveStrength = 400f;
-        public AnimationCurve MoveCurve = DefaultMoveCurve();
-        public AnimationCurve ScaleCurve = DefaultScaleCurve();
-        public int MaxPoolSize = 20;
-        public int CanvasSortingOrder = 20;
+        [BoxGroup("Animation")] public float SpawnRadius = 120f;
+        [BoxGroup("Animation")] public float StaggerDelay = 0.04f;
+        [BoxGroup("Animation")] public float Duration = 1f;
+        [BoxGroup("Animation")] public float CurveStrength = 400f;
+        [BoxGroup("Animation")] public AnimationCurve MoveCurve = DefaultMoveCurve();
+        [BoxGroup("Animation")] public AnimationCurve ScaleCurve = DefaultScaleCurve();
+        [BoxGroup("Animation")] public int MaxPoolSize = 20;
+        [BoxGroup("Animation")] public int CanvasSortingOrder = 20;
 
         private const string SaveKey = "items";
 

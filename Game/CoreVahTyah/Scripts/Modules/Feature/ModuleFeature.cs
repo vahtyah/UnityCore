@@ -1,13 +1,17 @@
 using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VahTyah.Inspector;
 
 namespace VahTyah
 {
     [CreateAssetMenu(menuName = "VahTyah/Modules/Feature", fileName = "Module_Feature")]
     public sealed class ModuleFeature : Module
     {
+        [BoxGroup("Definitions")]
         [SerializeField] internal FeatureDefinition[] Definitions = Array.Empty<FeatureDefinition>();
+        [BoxGroup("View")]
+        [Required]
         [SerializeField] private GameObject _unlockViewPrefab;
 
         private FeatureDefinition[] _sorted;

@@ -85,6 +85,7 @@ Ví dụ thêm `ModuleDailyReward`:
 4. **Module** `ModuleDailyReward.cs`:
    ```csharp
    [CreateAssetMenu(menuName = "VahTyah/Modules/DailyReward", fileName = "Module_DailyReward")]
+   [ModuleRequires(typeof(ModuleSave))]   // cần ModuleSave init trước → editor tự sắp, không sắp tay
    public sealed class ModuleDailyReward : Module
    {
        [SerializeField] private int _rewardCoin = 100;
@@ -107,15 +108,17 @@ Ví dụ thêm `ModuleDailyReward`:
        private void Persist() => Services.Get<SaveService>().Set(SaveKey, _save);
    }
    ```
-5. **Tạo asset**: `Create → VahTyah/Modules/DailyReward` trong `Config/`.
-6. **Thêm vào `ModuleConfig.Modules`** — đặt **sau `ModuleSave`** (vì dùng save). Đúng vị trí thứ tự nếu phụ thuộc module khác.
-7. **Document**: thêm event vào [EVENTS.md](EVENTS.md), module vào [MODULES.md](MODULES.md).
+5. **Add vào config**: chọn asset `ModuleConfig` → Inspector → **Add Module ▾** → `Modules/DailyReward`. Editor tạo module làm **sub-asset nhúng trong `ModuleConfig.asset`** (không sinh file `.asset` rời), tự thêm vào mảng và **auto-sort** theo `[ModuleRequires]`. Không kéo thả, không sắp tay.
+6. **Document**: thêm event vào [EVENTS.md](EVENTS.md), module vào [MODULES.md](MODULES.md).
 
-### Checklist thứ tự trong ModuleConfig
-- `ModuleSave` trước mọi module dùng save.
-- `ModuleSettingsScreen` trước `ModuleSound`/`ModuleHaptic`/`ModuleMusic` (các service cache `SettingsService` lúc init).
-- `ModulePool` trước `ModuleParticle` (và bất kỳ module prewarm pool).
-- `ModuleUIGroup` trước khi scene có `UIGroup`/`ScreenOnStart` load.
+### Thứ tự boot = data, không phải thao tác tay
+Ràng buộc thứ tự khai báo bằng `[ModuleRequires(typeof(...))]` trên chính class module; `ModuleConfigEditor` topo-sort ổn định theo đồ thị đó, nút **Doctor** (hiện ngay trong Inspector) cảnh báo nếu order vi phạm / thiếu `[CoreModule]` / trùng type / null. Các ràng buộc hiện đã encode:
+- `ModuleSettingsScreen`, `ModuleHeart`, `ModuleLevel`, `ModuleItem`, `ModuleTutorial` → `[ModuleRequires(ModuleSave)]`.
+- `ModuleSound`/`ModuleMusic`/`ModuleHaptic` → `[ModuleRequires(ModuleSettingsScreen)]` (⇒ transitively sau `ModuleSave`).
+- `ModuleParticle` → `[ModuleRequires(ModulePool)]`.
+- `ModuleSave` gắn `[CoreModule]` (bắt buộc, ẩn nút Remove; Doctor tự offer add nếu thiếu).
+
+> **`[ModuleRequires]` vs thứ tự mảng**: mảng vẫn là nguồn chân lý runtime (Bootstrap lặp `Config.Modules` tuần tự). `[ModuleRequires]` chỉ điều khiển editor sắp mảng cho đúng + kiểm tra. Module không ràng buộc giữ nguyên thứ tự tương đối hiện có (topo-sort ổn định) — vd thứ tự nội bộ nhóm Feedback do bạn kéo `▲`/`▼`.
 
 ---
 

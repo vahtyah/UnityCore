@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VahTyah.Inspector;
 
 namespace VahTyah
 {
     [CreateAssetMenu(menuName = "VahTyah/Modules/Pool", fileName = "Module_Pool")]
     public sealed class ModulePool : Module
     {
+        [BoxGroup("Pools")]
         [Tooltip("Pool tạo sẵn lúc boot (prefab + prewarm).")]
         public List<PoolEntry> Pools = new List<PoolEntry>();
 

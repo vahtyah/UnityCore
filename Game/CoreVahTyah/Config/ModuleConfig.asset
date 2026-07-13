@@ -1,5 +1,35 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-5687540653486838942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4f2282d8b171844face5877bae95925, type: 3}
+  m_Name: Module_FailScreen
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleFailScreen
+  Prefab: {fileID: 4322520909098502925, guid: 110f8a46c9f434a66b24052bf759a930, type: 3}
+--- !u!114 &-2134619344903844106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ec911d600ac1904d945b320635e6842, type: 3}
+  m_Name: Module_Transition
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleTransition
+  _transitionPrefab: {fileID: 0}
+  _fadeDuration: 0.3
+  _holdDuration: 0
+  _sprite: {fileID: 0}
+  _fadeColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12,16 +42,239 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 051c72e4709cfc449876c90a139fd5d8, type: 3}
   m_Name: ModuleConfig
   m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleConfig
-  DebugLogs: 0
+  DebugLogs: 1
   Modules:
-  - {fileID: 11400000, guid: 4793765cdeff6e74caff1539b9b806aa, type: 2}
-  - {fileID: 11400000, guid: 4969ddead3141334880ade6788ea0802, type: 2}
-  - {fileID: 11400000, guid: dcaaf7d44c8136340964166715cb6750, type: 2}
-  - {fileID: 11400000, guid: 80db5c99713f4ee45b112162899b65c8, type: 2}
-  - {fileID: 11400000, guid: 020c0a56f7e337b4f8df528386a3d2ff, type: 2}
-  - {fileID: 11400000, guid: 4f020889991fed547b143a02304a4b90, type: 2}
-  - {fileID: 11400000, guid: 1650068cfdd7c4b43b01014113f1b407, type: 2}
-  - {fileID: 11400000, guid: 082dec3d7ae969b49af70e54a7373d6c, type: 2}
-  - {fileID: 11400000, guid: 48ea15ff43c45344f9d50f3504e2e05f, type: 2}
-  - {fileID: 11400000, guid: 6b306e06d2bc2a1468fd403145c2f567, type: 2}
-  - {fileID: 11400000, guid: 919cb11751949b6478f4f0800c74d9a2, type: 2}
+  - {fileID: 6051730218078504677}
+  - {fileID: -2134619344903844106}
+  - {fileID: 7264247442000720890}
+  - {fileID: 7407174948820558664}
+  - {fileID: 5882058232256204606}
+  - {fileID: 7936823019446891407}
+  - {fileID: 582891417146279429}
+  - {fileID: 8090727097232892441}
+  - {fileID: -5687540653486838942}
+  - {fileID: 1385092749223253960}
+  - {fileID: 613586871771516639}
+--- !u!114 &582891417146279429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eef5535846f810442b2dad9d233bab4b, type: 3}
+  m_Name: Module_WinScreen
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleWinScreen
+  Prefab: {fileID: 5935236046425369879, guid: 19c87417a7b7e465e9128988eebefd94, type: 3}
+--- !u!114 &613586871771516639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3565f84a805f244d085504a886286e35, type: 3}
+  m_Name: Module_Haptic
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleHaptic
+  _gapMs: 20
+  _cooldownMs: 80
+  _androidIntensity: 1
+  _light:
+    DurationMs: 35
+    Amplitude: 200
+  _medium:
+    DurationMs: 45
+    Amplitude: 230
+  _heavy:
+    DurationMs: 60
+    Amplitude: 255
+--- !u!114 &1385092749223253960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c178a2560f87dc24c9d5e8d5ccc74d8c, type: 3}
+  m_Name: Module_SettingsScreen
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleSettingsScreen
+  Prefab: {fileID: 2579811782474062895, guid: 93328ac8644b64973a0aaa3520d00418, type: 3}
+--- !u!114 &5882058232256204606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6469b4f8820d0cb4fb8169269d812567, type: 3}
+  m_Name: Module_Level
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleLevel
+  _config:
+    TotalLevels: 10
+    NonLoopLevels: []
+  _enableTestLevel: 0
+  _testLevel: 1
+  _displayPrefab: {fileID: 6285704383643877808, guid: 7766500426e3f4b0b846c59ec2ec658b, type: 3}
+--- !u!114 &6051730218078504677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e4e892a985b1f24f9822875820dfe2e, type: 3}
+  m_Name: Module_Save
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleSave
+  _autoSaveInterval: 0
+--- !u!114 &7264247442000720890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8492a6d5fd122be4786a1ae5be5cf981, type: 3}
+  m_Name: Module_SceneLoader
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleSceneLoader
+  EntrySceneIndex: 1
+--- !u!114 &7407174948820558664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 654854003ab68514f9ef0d044d77966d, type: 3}
+  m_Name: Module_ScreenSettings
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleScreenSettings
+  _autoFrameRate: 0
+  _defaultFrameRate: 60
+  _batterySaveFrameRate: 30
+  _vSyncCount: 0
+  _sleepTimeout: -1
+--- !u!114 &7936823019446891407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cb364e9031c4884bb1c589b17be0aa9, type: 3}
+  m_Name: Module_Item
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleItem
+  Items:
+  - Key: 
+    Title: 
+    Icon: {fileID: 0}
+    Prefab: {fileID: 0}
+    StartAmount: 0
+  SpawnRadius: 120
+  StaggerDelay: 0.04
+  Duration: 1
+  CurveStrength: 400
+  MoveCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.4
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 4.8
+      outSlope: 4.8
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  ScaleCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.4
+      inSlope: 12
+      outSlope: 12
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.1
+      value: 1.5
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.5
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0.5
+      inSlope: -12
+      outSlope: -12
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  MaxPoolSize: 20
+  CanvasSortingOrder: 20
+--- !u!114 &8090727097232892441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6771a6d95d04858498d57d84738af2c2, type: 3}
+  m_Name: Module_Tutorial
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleTutorial
+  _tutorials: []

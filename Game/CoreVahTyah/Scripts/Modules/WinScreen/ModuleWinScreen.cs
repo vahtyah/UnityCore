@@ -1,11 +1,14 @@
     using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VahTyah.Inspector;
 
 namespace VahTyah
 {
     [CreateAssetMenu(menuName = "VahTyah/Modules/WinScreen", fileName = "Module_WinScreen")]
     public sealed class ModuleWinScreen : Module
     {
+        [BoxGroup("Screen")]
+        [Required(isError: true)]
         public GameObject Prefab;
 
         private GameObject _instance;

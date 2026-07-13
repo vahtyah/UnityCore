@@ -1,17 +1,19 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VahTyah.Inspector;
 
 namespace VahTyah
 {
     [CreateAssetMenu(menuName = "VahTyah/Modules/Sound", fileName = "Module_Sound")]
+    [ModuleRequires(typeof(ModuleSettingsScreen))]
     public sealed class ModuleSound : Module
     {
-        [Range(0f, 1f)] public float MasterVolume = 1f;
-        [Min(1)] public int PoolSize = 4;
-        [Min(0)] public int CooldownMs = 60;
+        [BoxGroup("Audio")] [Range(0f, 1f)] public float MasterVolume = 1f;
+        [BoxGroup("Audio")] [Min(1)] public int PoolSize = 4;
+        [BoxGroup("Audio")] [Min(0)] public int CooldownMs = 60;
 
-        public List<SoundEntry> Sounds = new List<SoundEntry>();
+        [BoxGroup("Clips")] public List<SoundEntry> Sounds = new List<SoundEntry>();
 
         private AudioSource[] _pool;
         private int _poolIndex;

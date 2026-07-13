@@ -1,12 +1,14 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using VahTyah.Inspector;
 
 namespace VahTyah
 {
     [CreateAssetMenu(menuName = "VahTyah/Modules/SceneLoader", fileName = "Module_SceneLoader")]
     public sealed class ModuleSceneLoader : Module
     {
+        [BoxGroup("Settings")]
         [Tooltip("Scene index vào game khi boot xong.")]
         public int EntrySceneIndex = 1;
 

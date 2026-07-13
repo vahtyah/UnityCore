@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VahTyah.Inspector;
 
 namespace VahTyah
 {
@@ -9,8 +10,11 @@ namespace VahTyah
     /// vì view query trạng thái các module đó qua *Get event khi mở.
     /// </summary>
     [CreateAssetMenu(menuName = "VahTyah/Modules/SettingsScreen", fileName = "Module_SettingsScreen")]
+    [ModuleRequires(typeof(ModuleSave))]
     public sealed class ModuleSettingsScreen : Module
     {
+        [BoxGroup("Screen")]
+        [Required(isError: true)]
         public GameObject Prefab;
 
         private SettingsView _instance;

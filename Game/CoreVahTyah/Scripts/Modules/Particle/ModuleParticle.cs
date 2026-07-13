@@ -1,13 +1,15 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VahTyah.Inspector;
 
 namespace VahTyah
 {
     [CreateAssetMenu(menuName = "VahTyah/Modules/Particle", fileName = "Module_Particle")]
+    [ModuleRequires(typeof(ModulePool))]
     public sealed class ModuleParticle : Module
     {
-        public List<ParticleEntry> Effects = new List<ParticleEntry>();
+        [BoxGroup("Effects")] public List<ParticleEntry> Effects = new List<ParticleEntry>();
 
         // key bằng int (cast từ enum) để tra O(1) không box. Reorder list không ảnh hưởng.
         private readonly Dictionary<int, ParticleEntry> _byId = new Dictionary<int, ParticleEntry>();

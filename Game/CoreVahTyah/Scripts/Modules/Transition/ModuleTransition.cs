@@ -1,18 +1,23 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VahTyah.Inspector;
 
 namespace VahTyah
 {
     [CreateAssetMenu(menuName = "VahTyah/Modules/Transition", fileName = "Module_Transition")]
     public sealed class ModuleTransition : Module
     {
+        [BoxGroup("Transition")]
         [SerializeField] private GameObject _transitionPrefab;
 
-        [Header("Fallback (không có prefab)")]
+        [BoxGroup("Fallback", "Fallback (không có prefab)")]
         [SerializeField] private float _fadeDuration = 0.3f;
+        [BoxGroup("Fallback")]
         [Tooltip("Giữ màn đen bao lâu (giây) TRƯỚC khi vén (uncover). 0 = không giữ.")]
         [SerializeField] private float _holdDuration = 0f;
+        [BoxGroup("Fallback")]
         [SerializeField] private Sprite _sprite;
+        [BoxGroup("Fallback")]
         [SerializeField] private Color _fadeColor = Color.black;
 
         private TransitionController _controller;

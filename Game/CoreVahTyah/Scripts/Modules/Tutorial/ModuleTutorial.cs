@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VahTyah.Inspector;
 
 namespace VahTyah
 {
     [CreateAssetMenu(menuName = "VahTyah/Modules/Tutorial", fileName = "Module_Tutorial")]
+    [ModuleRequires(typeof(ModuleSave))]
     public sealed class ModuleTutorial : Module
     {
         [Serializable]
@@ -15,6 +17,7 @@ namespace VahTyah
             public GameObject Prefab;
         }
 
+        [BoxGroup("Tutorials")]
         [SerializeField] private List<LevelTutorial> _tutorials = new List<LevelTutorial>();
 
         private const string SaveKey = "tutorial";

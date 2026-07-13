@@ -2,15 +2,17 @@ using System;
 using System.Diagnostics;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VahTyah.Inspector;
 using Debug = UnityEngine.Debug;
 
 namespace VahTyah
 {
     [CreateAssetMenu(menuName = "VahTyah/Modules/Heart", fileName = "Module_Heart")]
+    [ModuleRequires(typeof(ModuleSave))]
     public sealed class ModuleHeart : Module
     {
-        [Min(1)] public int MaxHearts = 5;
-        [Min(0.01f)] public float MinutesPerHeart = 1f;
+        [BoxGroup("Settings")] [Min(1)] public int MaxHearts = 5;
+        [BoxGroup("Settings")] [Min(0.01f)] public float MinutesPerHeart = 1f;
 
         private const string SaveKey = "hearts";
 

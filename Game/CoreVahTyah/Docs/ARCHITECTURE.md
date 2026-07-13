@@ -30,7 +30,8 @@ void    Unsubscribe();                        // (hiện chưa được Bootstra
 
 - Mỗi module cụ thể có `[CreateAssetMenu(menuName = "VahTyah/Modules/...")]` → tạo asset trong `Config/`.
 - Config của module = các field `[SerializeField]` trên chính asset đó (không cần class config riêng).
-- `CoreModuleAttribute` (`[CoreModule]`): đánh dấu module bắt buộc — editor tự thêm vào `ModuleConfig`, không cho xoá.
+- `CoreModuleAttribute` (`[CoreModule]`): đánh dấu module bắt buộc — `ModuleConfigEditor` ẩn nút Remove và Doctor offer-add nếu thiếu (hiện gắn trên `ModuleSave`).
+- `ModuleRequiresAttribute` (`[ModuleRequires(typeof(...))]`): khai báo module cần init trước; editor topo-sort mảng `Modules` theo đó (xem CONVENTIONS.md).
 - **State không lưu trong file cs**; module load state từ `SaveService` lúc `InitializeAsync` và giữ ref tới save-data object.
 
 `ModuleConfig.cs` — `ScriptableObject` chứa `Module[] Modules` + cờ `DebugLogs`. Đây là "bảng lắp ráp" toàn game.

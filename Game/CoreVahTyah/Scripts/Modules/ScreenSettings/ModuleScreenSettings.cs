@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VahTyah.Inspector;
 
 namespace VahTyah
 {
@@ -8,15 +9,18 @@ namespace VahTyah
     {
         public enum FrameRate { Rate30 = 30, Rate60 = 60, Rate90 = 90, Rate120 = 120 }
 
-        [Header("Frame Rate")]
+        [BoxGroup("Frame Rate")]
         [Tooltip("Tự lấy theo refresh rate màn hình thiết bị.")]
         [SerializeField] private bool _autoFrameRate;
+        [BoxGroup("Frame Rate")]
         [SerializeField] private FrameRate _defaultFrameRate = FrameRate.Rate60;
+        [BoxGroup("Frame Rate")]
         [Tooltip("FPS khi máy ở chế độ tiết kiệm pin (iOS).")]
         [SerializeField] private FrameRate _batterySaveFrameRate = FrameRate.Rate30;
 
-        [Header("Khác")]
+        [BoxGroup("Khác")]
         [SerializeField] private int _vSyncCount = 0;
+        [BoxGroup("Khác")]
         [Tooltip("-1 = NeverSleep (màn hình không tự tắt).")]
         [SerializeField] private int _sleepTimeout = SleepTimeout.NeverSleep;
 

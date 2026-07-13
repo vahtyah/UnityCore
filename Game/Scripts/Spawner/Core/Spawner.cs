@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-#if UNITY_EDITOR && VAHTYAH_CUSTOM_INSPECTOR
-using VahTyah.LevelEditor;
-#endif
+
 
 public abstract class Spawner : MonoBehaviour
 {
@@ -12,7 +10,7 @@ public abstract class Spawner : MonoBehaviour
 
     public virtual void Clear()
     {
-#if UNITY_EDITOR && VAHTYAH_CUSTOM_INSPECTOR
+/*#if UNITY_EDITOR
         if (!Application.isPlaying || LevelEditorUtils.IsInScene("LevelEditor"))
         {
             if (transform != null)
@@ -23,7 +21,7 @@ public abstract class Spawner : MonoBehaviour
                 }
             }
         }
-#endif
+#endif*/
         
         foreach (var pixel in SpawnedObjects)
         {

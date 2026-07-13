@@ -1,19 +1,23 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VahTyah.Inspector;
 
 namespace VahTyah
 {
     [CreateAssetMenu(menuName = "VahTyah/Modules/Level", fileName = "Module_Level")]
+    [ModuleRequires(typeof(ModuleSave))]
     public sealed class ModuleLevel : Module
     {
+        [BoxGroup("Config")]
         [SerializeField] private LevelConfig _config = new LevelConfig();
 
-        [Header("Test Mode")]
+        [BoxGroup("Test Mode")]
         [SerializeField] private bool _enableTestLevel;
+        [BoxGroup("Test Mode")]
         [SerializeField] private int _testLevel = 1;
 
-        [Header("Display")]
+        [BoxGroup("Display")]
         [Tooltip("Prefab UI hiện số level. Spawn 1 lần lúc boot, sống xuyên scene. Để trống = không spawn.\nGắn UIGroup trên prefab nếu muốn ẩn/hiện theo màn.")]
         [SerializeField] private GameObject _displayPrefab;
 
