@@ -1,5 +1,27 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-9114549380049739641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d852c8d351ae61c49979d17811f18fd0, type: 3}
+  m_Name: Module_Feature
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleFeature
+  Definitions:
+  - Name: 
+    LevelMin: 0
+    LevelMax: 5
+    Icon: {fileID: -1553681705, guid: 9049e7e8326609446909fcddc8f83600, type: 3}
+    IconDark: {fileID: -1553681705, guid: 9049e7e8326609446909fcddc8f83600, type: 3}
+    ConditionText: 123
+    UnlockTitle: 
+    UnlockDescription: 
+  _unlockViewPrefab: {fileID: 0}
 --- !u!114 &-5687540653486838942
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -55,6 +77,7 @@ MonoBehaviour:
   - {fileID: -5687540653486838942}
   - {fileID: 1385092749223253960}
   - {fileID: 613586871771516639}
+  - {fileID: -9114549380049739641}
 --- !u!114 &582891417146279429
 MonoBehaviour:
   m_ObjectHideFlags: 0
