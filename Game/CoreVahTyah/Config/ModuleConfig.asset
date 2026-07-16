@@ -22,6 +22,20 @@ MonoBehaviour:
     UnlockTitle: 
     UnlockDescription: 
   _unlockViewPrefab: {fileID: 0}
+--- !u!114 &-7834782502262248060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5d0ef73288470d458c6896cee72ab8e, type: 3}
+  m_Name: Module_Heart
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleHeart
+  MaxHearts: 5
+  MinutesPerHeart: 1
 --- !u!114 &-7007098414862035835
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -243,6 +257,7 @@ MonoBehaviour:
   - {fileID: -7007098414862035835}
   - {fileID: -5475724099778134868}
   - {fileID: 5869105738471141159}
+  - {fileID: -7834782502262248060}
 --- !u!114 &582891417146279429
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -293,7 +308,9 @@ MonoBehaviour:
   m_Name: Module_Music
   m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleMusic
   _crossfade: 0.6
-  Tracks: []
+  Tracks:
+  - Id: 0
+    Clip: {fileID: 0}
 --- !u!114 &5882058232256204606
 MonoBehaviour:
   m_ObjectHideFlags: 0
