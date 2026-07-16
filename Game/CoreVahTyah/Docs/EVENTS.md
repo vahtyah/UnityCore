@@ -82,18 +82,14 @@ API surface để module giao tiếp. Tất cả là `struct : IEvent`. Publish 
 | `FeaturePendingUnlock` | Notify | `int Index` | Có unlock đang chờ show |
 | `FeatureConsumePending` | Query | `Action<bool> Reply` | Lấy + clear pending unlock |
 
-## Particle
+## Feedback / VFX — KHÔNG dùng event
 
-| Event | Loại | Field | Ghi chú |
-|-------|------|-------|---------|
-| `ParticlePlay` | Cmd | `ParticleId Id; Vector3 Position` | Spawn particle (world) qua Pool |
-| `ParticlePlayUI` | Cmd | `ParticleId Id; Vector3 Position` | Particle trên UI |
-
-> **Sound / Music / Haptic KHÔNG dùng event** (đổi từ 2026-07). Là command tần suất cao, đúng 1 nơi xử lý → gọi trực tiếp qua service + shortcut tĩnh, không qua EventBus:
+> **Sound / Music / Haptic / Particle KHÔNG dùng event** (đổi từ 2026-07). Là command tần suất cao, đúng 1 nơi xử lý → gọi trực tiếp qua service + shortcut tĩnh, không qua EventBus:
 > ```csharp
 > Sound.Play(SoundId.Click);
 > Music.Play(MusicId.Home);  Music.Stop();  Music.SetVolume(0.5f);
 > Haptic.Play(HapticType.Light);  await Haptic.PlaySequence(false, HapticType.Light, HapticType.Heavy);
+> Particles.Play(ParticleId.Explosion, worldPos);  // trả GameObject; overload có rotation / parent (follow)
 > ```
 > Bật/tắt + volume đọc từ `SettingsService` (SSOT). Xem [CONVENTIONS.md](CONVENTIONS.md) → "Command → Service hay Event?" và [MODULES.md](MODULES.md).
 

@@ -22,6 +22,19 @@ MonoBehaviour:
     UnlockTitle: 
     UnlockDescription: 
   _unlockViewPrefab: {fileID: 0}
+--- !u!114 &-7007098414862035835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 657b4f1334f868a44b3553f5826f6fc5, type: 3}
+  m_Name: Module_Pool
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModulePool
+  Pools: []
 --- !u!114 &-5864541085533822240
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -48,6 +61,19 @@ MonoBehaviour:
   m_Name: Module_FailScreen
   m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleFailScreen
   Prefab: {fileID: 4322520909098502925, guid: 110f8a46c9f434a66b24052bf759a930, type: 3}
+--- !u!114 &-5475724099778134868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 104f471917d9fc94fa826fdc7fdded29, type: 3}
+  m_Name: Module_Particle
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleParticle
+  Effects: []
 --- !u!114 &-2134619344903844106
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,6 +239,9 @@ MonoBehaviour:
   - {fileID: 613586871771516639}
   - {fileID: -675589074100092952}
   - {fileID: 9072522334924650911}
+  - {fileID: 7790439949304028110}
+  - {fileID: -7007098414862035835}
+  - {fileID: -5475724099778134868}
 --- !u!114 &582891417146279429
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -310,6 +339,27 @@ MonoBehaviour:
   _batterySaveFrameRate: 30
   _vSyncCount: 0
   _sleepTimeout: -1
+--- !u!114 &7790439949304028110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a932b35ef2ad3d4a8d2152ca390df43, type: 3}
+  m_Name: Module_Sound
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleSound
+  MasterVolume: 1
+  PoolSize: 4
+  CooldownMs: 60
+  Sounds:
+  - Id: 0
+    Volume: 0
+    Pitch: 0
+    Sequential: 0
+    Clips: []
 --- !u!114 &7936823019446891407
 MonoBehaviour:
   m_ObjectHideFlags: 0

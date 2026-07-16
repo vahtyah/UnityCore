@@ -5,46 +5,28 @@ using VahTyah.Inspector;
 
 namespace VahTyah
 {
+    /// <summary>
+    /// Factory mỏng: register <see cref="ParticleService"/> để spawn particle qua shortcut <see cref="Particles"/>.
+    /// Prewarm pool cho các effect lúc boot. Không nghe event. Cần <see cref="ModulePool"/> boot trước.
+    /// </summary>
     [CreateAssetMenu(menuName = "VahTyah/Modules/Particle", fileName = "Module_Particle")]
     [ModuleRequires(typeof(ModulePool))]
     public sealed class ModuleParticle : Module
     {
         [BoxGroup("Effects")] public List<ParticleEntry> Effects = new List<ParticleEntry>();
 
-        // key bằng int (cast từ enum) để tra O(1) không box. Reorder list không ảnh hưởng.
-        private readonly Dictionary<int, ParticleEntry> _byId = new Dictionary<int, ParticleEntry>();
-
         public override UniTask InitializeAsync(Transform holder)
         {
-            _byId.Clear();
-            bool hasPool = Services.Has<PoolService>();
+            if (!Services.TryGet<PoolService>(out var pool))
+                Debug.LogWarning("[Particle] Cần ModulePool boot trước ModuleParticle để prewarm/spawn.");
 
-            foreach (var e in Effects)
-            {
-                if (e.Prefab == null) continue;
-                _byId[(int)e.Id] = e;
+            if (pool != null)
+                foreach (var e in Effects)
+                    if (e != null && e.Prefab != null && e.Prewarm > 0)
+                        pool.Register(e.Prefab, e.Prewarm);
 
-                if (hasPool && e.Prewarm > 0)
-                    Pool.Register(e.Prefab, e.Prewarm);
-            }
-
-            if (!hasPool)
-                Debug.LogWarning("[Particle] Cần ModulePool boot trước ModuleParticle để prewarm.");
-
+            Services.Register(new ParticleService(Effects, pool));
             return UniTask.CompletedTask;
-        }
-
-        public override void Subscribe()
-        {
-            EventBus.On<ParticlePlay>(OnPlay);
-        }
-
-        private void OnPlay(ParticlePlay e)
-        {
-            if (!_byId.TryGetValue((int)e.Id, out var entry) || entry.Prefab == null)
-                return;
-
-            Pool.Spawn(entry.Prefab, e.Position, Quaternion.identity);
         }
     }
 }

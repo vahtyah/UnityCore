@@ -83,7 +83,7 @@ Mỗi module là 1 `ScriptableObject` asset trong `Config/`, thêm vào `ModuleC
 ### ModuleParticle
 - **Menu**: `VahTyah/Modules/Particle`
 - **Knobs**: `Effects` (List `ParticleEntry{Id, Prefab, Prewarm}`).
-- Spawn particle qua `Pool`. **Cần ModulePool boot trước** để prewarm (nếu không có sẽ log warning). (Particle vẫn dùng event `ParticlePlay`/`ParticlePlayUI`.)
+- Register `ParticleService`; spawn qua shortcut **`Particles.Play(id, pos)`** (không dùng event nữa — như Sound/Haptic). Overload có `rotation` và `parent` (particle follow object). Prewarm pool lúc boot — **cần ModulePool boot trước** (nếu thiếu sẽ log warning, `Play` trả null). `ParticleService` **tự AddComponent `PooledParticle` lúc spawn** nếu prefab chưa có → không cần gắn tay (component tự lái qua OnEnable/OnDisable: Play khi spawn, Stop+Clear khi despawn, tự despawn khi particle dừng). Muốn đặt `_maxLifetime > 0` (despawn cưỡng bức cho looping/leak) thì gắn sẵn `PooledParticle` trên prefab — instance auto-add luôn có lifetime = 0.
 
 ### ModuleHaptic
 - **Menu**: `VahTyah/Modules/Haptic` · **Save key**: — (cờ ở `settings.Haptics`)
