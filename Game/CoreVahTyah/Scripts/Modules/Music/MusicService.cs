@@ -44,5 +44,17 @@ namespace VahTyah
             _settings?.SetMusicVolume(volume);
             _player.SetVolume(Volume);
         }
+
+        /// <summary>Tạm dừng nhạc nền, giữ vị trí phát (dùng khi game pause).</summary>
+        public void Pause() => _player.Pause();
+
+        /// <summary>Tiếp tục nhạc nền sau <see cref="Pause"/>.</summary>
+        public void Resume() => _player.Resume();
+
+        /// <summary>Hạ gain nhạc nền xuống <paramref name="factor"/> (0..1) — vd khi mở popup.</summary>
+        public void Duck(float factor = 0.3f, float duration = 0.25f) => _player.Duck(factor, duration);
+
+        /// <summary>Trả gain nhạc nền về full sau <see cref="Duck"/>.</summary>
+        public void Unduck(float duration = 0.25f) => _player.Unduck(duration);
     }
 }

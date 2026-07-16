@@ -78,7 +78,9 @@ Mỗi module là 1 `ScriptableObject` asset trong `Config/`, thêm vào `ModuleC
 ### ModuleMusic
 - **Menu**: `VahTyah/Modules/Music` · **Save key**: — (cờ ở `settings.Sound`, volume ở `settings.MusicVolume`)
 - **Knobs**: `_crossfade` (giây, mặc định 0.6), `Tracks` (List `MusicEntry{Id, Clip}`).
-- Register `MusicService` + spawn `[MusicPlayer]` (crossfade khi đổi track). Nhạc phát liên tục nên service **nghe `SettingsChanged`** để mute/unmute ngay. Shortcut: `Music.Play(id)`/`Stop()`/`SetVolume(v)`.
+- Register `MusicService` + spawn `[MusicPlayer]` (crossfade khi đổi track). Nhạc phát liên tục nên service **nghe `SettingsChanged`** để mute/unmute ngay. Shortcut: `Music.Play(id)`/`Stop()`/`SetVolume(v)`/`Pause()`/`Resume()`/`Duck(factor,dur)`/`Unduck(dur)`.
+- Fade dùng **LitMotion** (`MotionScheduler.UpdateIgnoreTimeScale`) → chạy cả khi `timeScale = 0`, huỷ được. Gain **sống** (volume × duck × cờ Sound) áp ngay cả khi đang fade — đổi volume/mute giữa crossfade không bị bỏ qua.
+- `Pause`/`Resume`: tạm dừng giữ vị trí phát (game pause). `Duck`/`Unduck`: hạ/trả gain nhạc nền (vd hạ khi mở popup) — caller tự gọi vì Core chưa có event panel-shown.
 
 ### ModuleParticle
 - **Menu**: `VahTyah/Modules/Particle`

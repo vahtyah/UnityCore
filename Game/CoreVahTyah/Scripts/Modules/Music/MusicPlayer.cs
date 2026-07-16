@@ -1,23 +1,42 @@
-using System.Collections;
+using System;
+using LitMotion;
 using UnityEngine;
 
 namespace VahTyah
 {
     /// <summary>
     /// Phát nhạc nền với crossfade (2 AudioSource). Persistent (do ModuleMusic đặt dưới holder).
-    /// Fade dùng unscaledTime để chạy cả khi game pause.
+    ///
+    /// Fade dùng LitMotion với <see cref="MotionScheduler.UpdateIgnoreTimeScale"/> — chạy cả khi game pause
+    /// (timeScale = 0) và huỷ được, thay cho coroutine + unscaledTime cũ.
+    ///
+    /// Tách bạch hai thứ:
+    ///  - <b>Mix crossfade</b> (<c>_fadeT</c> 0→1) do LitMotion lái.
+    ///  - <b>Gain sống</b> = volume × duck × cờ Sound. Đổi bất cứ lúc nào (kể cả GIỮA fade) đều áp ngay
+    ///    qua <see cref="ApplyMix"/> — sửa lỗi cũ: đổi volume/mute lúc đang fade bị bỏ qua.
     /// </summary>
     public sealed class MusicPlayer : MonoBehaviour
     {
         private AudioSource _a;
         private AudioSource _b;
-        private AudioSource _current;
+        private AudioSource _to;      // slot hiện hành (nghe được khi _playing)
+        private AudioSource _from;     // slot đang fade-out (null khi không crossfade)
         private AudioClip _currentClip;
+        private bool _playing;
 
         private float _fade = 0.6f;
-        private float _volume = 1f;
-        private bool _active = true;
-        private Coroutine _routine;
+        private float _fadeT = 1f;     // 0..1: tiến độ crossfade
+        private MotionHandle _fadeMotion;
+        private MotionHandle _duckMotion;
+        private Action _onFadeDone;
+
+        // Gain sống (SSOT là settings; duck/pause là runtime).
+        private float _volume = 1f;    // MusicVolume
+        private bool _soundOn = true;  // cờ Sound
+        private float _duck = 1f;      // hệ số duck (1 = full)
+        private bool _paused;
+
+        private float Gain => _soundOn ? _volume * _duck : 0f;
 
         public void Init(float fadeDuration)
         {
@@ -31,89 +50,158 @@ namespace VahTyah
                 s.playOnAwake = false;
                 s.volume = 0f;
             }
-            _current = _a;
+            _to = _a;
         }
 
-        public void Configure(float volume, bool active)
+        // ── Settings (gọi từ MusicService) ─────────────────────────────
+
+        public void Configure(float volume, bool soundOn)
         {
             _volume = Mathf.Clamp01(volume);
-            _active = active;
-            ApplyVolume();
+            _soundOn = soundOn;
+            ApplyMix();
         }
 
-        public void Play(AudioClip clip)
+        public void SetActive(bool soundOn)
         {
-            if (clip == null) return;
-            if (clip == _currentClip && _current.isPlaying) return;
-
-            _currentClip = clip;
-
-            var from = _current;
-            var to = _current == _a ? _b : _a;
-            to.clip = clip;
-            to.volume = 0f;
-            to.Play();
-            _current = to;
-
-            StartFade(from, to);
-        }
-
-        public void Stop()
-        {
-            _currentClip = null;
-            StartFade(_current, null);
-        }
-
-        public void SetActive(bool active)
-        {
-            _active = active;
-            ApplyVolume();
+            _soundOn = soundOn;
+            ApplyMix();
         }
 
         public void SetVolume(float volume)
         {
             _volume = Mathf.Clamp01(volume);
-            ApplyVolume();
+            ApplyMix();
         }
 
-        private void ApplyVolume()
-        {
-            // Áp ngay nếu không đang crossfade; nếu đang fade thì để fade tự tới target.
-            if (_routine != null) return;
-            if (_current != null && _current.isPlaying)
-                _current.volume = _active ? _volume : 0f;
-        }
+        // ── Playback ───────────────────────────────────────────────────
 
-        private void StartFade(AudioSource from, AudioSource to)
+        public void Play(AudioClip clip)
         {
-            if (_routine != null) StopCoroutine(_routine);
-            _routine = StartCoroutine(FadeRoutine(from, to));
-        }
+            if (clip == null) return;
+            if (clip == _currentClip && _playing && !_fadeMotion.IsActive()) return;
 
-        private IEnumerator FadeRoutine(AudioSource from, AudioSource to)
-        {
-            float target = _active ? _volume : 0f;
-            float fromStart = from != null ? from.volume : 0f;
-            float t = 0f;
+            _currentClip = clip;
 
-            while (t < _fade)
+            // Bỏ nguồn fade-out dở dang để chỉ crossfade tối đa 2 nguồn.
+            if (_from != null) HardStop(_from);
+
+            if (_playing)
             {
-                t += Time.unscaledDeltaTime;
-                float k = t / _fade;
-                if (from != null) from.volume = Mathf.Lerp(fromStart, 0f, k);
-                if (to != null) to.volume = Mathf.Lerp(0f, target, k);
-                yield return null;
+                _from = _to;             // track cũ fade-out
+                _to = Other(_to);
+            }
+            // else: _to đang là slot im lặng, tái dùng làm track mới.
+
+            _to.clip = clip;
+            _to.volume = 0f;
+            _to.Play();
+            if (_paused) _to.Pause();    // giữ nguyên trạng thái pause
+            _playing = true;
+
+            StartFade();
+        }
+
+        public void Stop()
+        {
+            if (!_playing && _from == null) return;
+
+            _currentClip = null;
+            if (_from != null) HardStop(_from);
+
+            if (_playing)
+            {
+                _from = _to;             // track hiện hành fade-out
+                _to = Other(_to);
+            }
+            _playing = false;
+
+            StartFade();
+        }
+
+        // ── Pause/Resume (game pause) ──────────────────────────────────
+
+        public void Pause()
+        {
+            if (_paused) return;
+            _paused = true;
+            if (_a != null) _a.Pause();
+            if (_b != null) _b.Pause();
+        }
+
+        public void Resume()
+        {
+            if (!_paused) return;
+            _paused = false;
+            if (_a != null) _a.UnPause();
+            if (_b != null) _b.UnPause();
+        }
+
+        // ── Duck (hạ nhạc nền khi mở popup) ────────────────────────────
+
+        /// <summary>Hạ gain nhạc nền xuống <paramref name="factor"/> (0..1) trong <paramref name="duration"/> giây.</summary>
+        public void Duck(float factor, float duration = 0.25f)
+        {
+            factor = Mathf.Clamp01(factor);
+            if (_duckMotion.IsActive()) _duckMotion.Cancel();
+
+            if (duration <= 0f)
+            {
+                _duck = factor;
+                ApplyMix();
+                return;
             }
 
-            if (from != null)
-            {
-                from.volume = 0f;
-                from.Stop();
-                from.clip = null;
-            }
-            if (to != null) to.volume = target;
+            _duckMotion = LMotion.Create(_duck, factor, duration)
+                .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+                .Bind(this, static (d, self) => { self._duck = d; self.ApplyMix(); });
+        }
 
-            _routine = null;
+        /// <summary>Trả nhạc nền về full gain.</summary>
+        public void Unduck(float duration = 0.25f) => Duck(1f, duration);
+
+        // ── Nội bộ ─────────────────────────────────────────────────────
+
+        private AudioSource Other(AudioSource s) => s == _a ? _b : _a;
+
+        private void StartFade()
+        {
+            if (_fadeMotion.IsActive()) _fadeMotion.Cancel();
+            _fadeT = 0f;
+            ApplyMix();
+            _fadeMotion = LMotion.Create(0f, 1f, _fade)
+                .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
+                .WithOnComplete(_onFadeDone ??= OnFadeDone)
+                .Bind(this, static (t, self) => { self._fadeT = t; self.ApplyMix(); });
+        }
+
+        private void OnFadeDone()
+        {
+            if (_from != null) HardStop(_from);
+            _from = null;
+            _fadeT = 1f;
+            ApplyMix();
+        }
+
+        /// <summary>Áp gain sống lên 2 nguồn theo mix hiện tại — an toàn gọi bất cứ lúc nào.</summary>
+        private void ApplyMix()
+        {
+            float g = Gain;
+            if (_from != null) _from.volume = (1f - _fadeT) * g;
+            if (_to != null) _to.volume = (_playing ? _fadeT : 0f) * g;
+        }
+
+        private static void HardStop(AudioSource s)
+        {
+            s.Stop();
+            s.clip = null;
+            s.volume = 0f;
+        }
+
+        private void OnDestroy()
+        {
+            if (_fadeMotion.IsActive()) _fadeMotion.Cancel();
+            if (_duckMotion.IsActive()) _duckMotion.Cancel();
         }
     }
 }
