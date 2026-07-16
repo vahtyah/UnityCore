@@ -87,6 +87,7 @@ GameObject:
   - component: {fileID: 5118020411500133899}
   - component: {fileID: 8482185154970244913}
   - component: {fileID: 5788416674997224033}
+  - component: {fileID: 431439513804066209}
   m_Layer: 5
   m_Name: CloseButton
   m_TagString: Untagged
@@ -196,3 +197,17 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &431439513804066209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4825307427143188236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69edcfa376210d74abe5d06b99f828f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.InteractableFeedback
+  _visual: {fileID: 1719096741266995668}
+  _style: 0

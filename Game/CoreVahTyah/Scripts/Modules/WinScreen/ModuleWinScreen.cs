@@ -12,12 +12,12 @@ namespace VahTyah
         public GameObject Prefab;
 
         private GameObject _instance;
-        private IPanelView _winView;
+        private IPanelAnimator _winView;
 
         public override UniTask InitializeAsync(Transform holder)
         {
             _instance = Object.Instantiate(Prefab, holder);
-            _winView = _instance.GetComponent<IPanelView>();
+            _winView = _instance.GetComponent<IPanelAnimator>();
             _instance.SetActive(false);
 
             return UniTask.CompletedTask;

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 903350021506208460}
   - component: {fileID: 4524068766839397261}
   - component: {fileID: 8927741647585810467}
+  - component: {fileID: 7698019584888857996}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -136,6 +137,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playAgainButton: {fileID: 4524068766839397261}
+--- !u!114 &7698019584888857996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 97505982158729989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69edcfa376210d74abe5d06b99f828f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.InteractableFeedback
+  _visual: {fileID: 7471608246220984444}
+  _style: 0
+  _callOnHold: 0
+  onClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &4475252192536426542
 GameObject:
   m_ObjectHideFlags: 0
@@ -347,8 +366,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4286001920
-  m_fontColor: {r: 0, g: 0.2, b: 0.46666667, a: 1}
+    rgba: 4281545523
+  m_fontColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

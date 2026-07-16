@@ -343,9 +343,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2579811782474062895}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 07d9c8badcec9345078901234560f237, type: 3}
+  m_Script: {fileID: 11500000, guid: fc5723de876eab44b8e916360ea9ecd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _style: 0
   _panel: {fileID: 5926572727590591799}
   _scaleCurve:
     serializedVersion: 2

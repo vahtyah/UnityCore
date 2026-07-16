@@ -6,7 +6,7 @@ using VahTyah.Inspector;
 namespace VahTyah
 {
     [CreateAssetMenu(menuName = "VahTyah/Modules/Sound", fileName = "Module_Sound")]
-    [ModuleRequires(typeof(ModuleSettingsScreen))]
+    [ModuleRequires(typeof(ModuleSettings))]
     public sealed class ModuleSound : Module
     {
         [BoxGroup("Audio")] [Range(0f, 1f)] public float MasterVolume = 1f;

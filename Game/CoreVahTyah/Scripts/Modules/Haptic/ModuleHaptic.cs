@@ -22,7 +22,7 @@ namespace VahTyah
     /// Boot SAU ModuleSave và ModuleSettingsScreen (service cần <see cref="SettingsService"/> để đọc cờ bật/tắt).
     /// </summary>
     [CreateAssetMenu(menuName = "VahTyah/Modules/Haptic", fileName = "Module_Haptic")]
-    [ModuleRequires(typeof(ModuleSettingsScreen))]
+    [ModuleRequires(typeof(ModuleSettings))]
     public sealed class ModuleHaptic : Module
     {
         [BoxGroup("Sequential")]

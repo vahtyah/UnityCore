@@ -65,7 +65,7 @@ Mỗi module là 1 `ScriptableObject` asset trong `Config/`, thêm vào `ModuleC
 
 ### ModuleSettingsScreen
 - **Menu**: `VahTyah/Modules/SettingsScreen` · **Save key**: `settings` (`SettingsSaveData{Sound, Sfx, Haptics, MusicVolume}`)
-- **Knobs**: `Prefab` (popup, có `SettingsView` + `PopupView`; instantiate 1 lần lúc boot, ẩn sẵn).
+- **Knobs**: `Prefab` (popup, có `SettingsView` + `PopupAnimator`; instantiate 1 lần lúc boot, ẩn sẵn).
 - Register `SettingsService` — **SSOT cho mọi preference audio/haptic**: `Sound` (BGM), `Sfx`, `Haptics`, `MusicVolume`. Mở popup khi `OpenSettingsRequest`; `SettingsView` đọc/ghi qua service, publish `SettingsChanged` khi toggle. **Boot sau `ModuleSave`, trước Sound/Haptic/Music.**
 
 > **Sound/Music/Haptic dùng Service, không dùng event.** Mỗi `Module` là factory register 1 service vào `Services`; gọi qua shortcut tĩnh (`Sound`/`Music`/`Haptic`). Cờ bật/tắt + volume đọc từ `SettingsService` (không lưu riêng). **Phải boot sau `ModuleSettingsScreen`.** Xem [CONVENTIONS.md](CONVENTIONS.md).
@@ -90,6 +90,16 @@ Mỗi module là 1 `ScriptableObject` asset trong `Config/`, thêm vào `ModuleC
 - **Knobs**: `_gapMs` (nghỉ giữa haptic trong chuỗi), `_cooldownMs` (mặc định 80), `_androidIntensity` (0-2, scale tổng), `_light/_medium/_heavy` (`HapticOneShot{DurationMs, Amplitude}` — chỉnh mạnh/nhẹ từng loại, **chỉ Android**).
 - Register `HapticService`; provider theo platform: `HapticProviderAndroid` / `HapticProviderIOS` / `HapticProviderDefault` (editor). Gate bằng `SettingsService.Haptics`; `Force` bỏ qua cooldown nhưng không ghi đè khi user tắt. Shortcut: `Haptic.Play(type, force)`/`PlaySequence(force, types)`.
 - **Chỉnh cường độ:** Light/Medium/Heavy tune qua `DurationMs`+`Amplitude` per-type × `_androidIntensity`. `Amplitude` chỉ có tác dụng trên máy có amplitude control (init log `hasAmplitudeControl`); máy không có thì `DurationMs` là đòn bẩy duy nhất. Success/Warning/Failure là waveform cố định. **iOS không tune được** (system feedback). Editor no-op.
+
+### ModuleInteractable
+- **Menu**: `VahTyah/Modules/Interactable` · **Save key**: — (không lưu)
+- **Knobs**: `_styles` (List `InteractableStyleProfile` keyed theo `InteractableStyleId`: `PressDuration/ReleaseDuration/PressedScale`, `BounceScale/BounceUp/BounceDown`, 4 easing curve, + `ClickHaptic`/`ClickSound`).
+- Factory mỏng: register `InteractableStyleService` (bảng tra O(1), fallback `Default`). `InteractableFeedback` (dùng chung cho button/toggle/...) chọn 1 `InteractableStyleId`, đọc qua shortcut `InteractableStyle.Get(id)`; thiếu module → code-default. **Thuần feedback**: scale nhấn/thả/nảy + haptic/sound theo pointer, KHÔNG tự gọi hành động — logic do Unity Button/Toggle cùng GameObject xử lý. Feedback click qua `Haptic.Play`/`Sound.Play` (gate sẵn bởi `SettingsService`).
+
+### ModulePanel
+- **Menu**: `VahTyah/Modules/Panel` · **Save key**: — (không lưu)
+- **Knobs**: `_popupStyles` (List `PopupStyle` keyed `PopupStyleId`: `ScaleCurve`+`FadeInDuration` mở; `HasCloseAnimation`/`CloseDuration`/`CloseScale`/`CloseEase` đóng) + `_fadeStyles` (List `FadeStyle` keyed `FadeStyleId`: `FadeIn`/`FadeInDuration`/`FadeOut`/`FadeOutDuration`).
+- Factory mỏng: register `PanelStyleService` (2 bảng tra O(1), mỗi loại fallback `Default`). Quản lý animation cho mọi `IPanelAnimator`: `PopupAnimator` (scale+fade) đọc `PanelStyle.Popup(_style)`, `FadeAnimator` (fade-only) đọc `PanelStyle.Fade(_style)`. Cả hai **chỉ giữ `_style`** (+ `_panel` cho Popup) — không field style cục bộ, một nguồn sự thật. Thiếu `ModulePanel`/profile → fallback code-default.
 
 ---
 

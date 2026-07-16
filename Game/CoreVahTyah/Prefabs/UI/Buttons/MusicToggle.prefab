@@ -198,6 +198,7 @@ GameObject:
   - component: {fileID: 6434748872113316274}
   - component: {fileID: 8923616015083314391}
   - component: {fileID: 4776391304933330870}
+  - component: {fileID: 5978552201623397899}
   m_Layer: 5
   m_Name: MusicToggle
   m_TagString: Untagged
@@ -288,6 +289,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   toggle: {fileID: 8923616015083314391}
   slash: {fileID: 5164868802328128268}
+--- !u!114 &5978552201623397899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6193088733244448149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69edcfa376210d74abe5d06b99f828f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.InteractableFeedback
+  _visual: {fileID: 6434748872113316274}
+  _style: 2
 --- !u!1 &8619855216161753787
 GameObject:
   m_ObjectHideFlags: 0

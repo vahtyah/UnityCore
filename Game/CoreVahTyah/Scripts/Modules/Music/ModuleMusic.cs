@@ -10,7 +10,7 @@ namespace VahTyah
     /// Boot SAU ModuleSave và ModuleSettingsScreen (service cần <see cref="SettingsService"/> để đọc cờ + volume).
     /// </summary>
     [CreateAssetMenu(menuName = "VahTyah/Modules/Music", fileName = "Module_Music")]
-    [ModuleRequires(typeof(ModuleSettingsScreen))]
+    [ModuleRequires(typeof(ModuleSettings))]
     public sealed class ModuleMusic : Module
     {
         [BoxGroup("Settings")]

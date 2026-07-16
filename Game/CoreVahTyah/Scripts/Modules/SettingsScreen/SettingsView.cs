@@ -6,7 +6,7 @@ namespace VahTyah
 {
     public class SettingsView : MonoBehaviour
     {
-        [SerializeField] private PopupView _view;
+        [SerializeField] private PopupAnimator _view;
         [SerializeField] private Toggle _musicToggle;
         [SerializeField] private Toggle _sfxToggle;
         [SerializeField] private Toggle _hapticsToggle;

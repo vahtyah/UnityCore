@@ -1,25 +1,32 @@
 using System;
 using LitMotion;
 using UnityEngine;
+using VahTyah;
 
 /// <summary>
-/// Reusable fade-only show/hide for a CanvasGroup, driven by LitMotion. SetActive and the
-/// interactable/blocksRaycasts states are handled internally, so callers only use Show / Hide.
-/// A lighter sibling of <see cref="PopupView"/> for panels that need a plain fade (no scale pop).
+/// Fade-only show/hide for a CanvasGroup, driven by LitMotion. SetActive and interactable/blocksRaycasts
+/// are handled internally, so callers only use Show / Hide. A lighter sibling of PopupAnimator (no scale).
+///
+/// Params come from the shared PanelStyleService (ModulePanel) via _style (FadeStyle) — the component holds
+/// NO local style fields. Missing service/profile → code default. Only _style lives here.
 /// </summary>
 [RequireComponent(typeof(CanvasGroup))]
-public class FadeView : MonoBehaviour, IPanelView
+public class FadeAnimator : MonoBehaviour, IPanelAnimator
 {
-    [SerializeField] private bool fadeIn = true;
-    [SerializeField] private float _fadeInDuration = 0.2f;
-    [SerializeField] private bool fadeOut = true;
-    [SerializeField] private float _fadeOutDuration = 0.15f;
+    [Tooltip("Shared fade style from ModulePanel. Missing service/profile → code default.")]
+    [SerializeField] private FadeStyleId _style = FadeStyleId.Default;
+
+    // Fallback khi chưa có ModulePanel.
+    private static FadeStyle _codeDefault;
+    private static FadeStyle CodeDefault => _codeDefault ??= new FadeStyle();
 
     private CanvasGroup _cg;
     private MotionHandle _alpha;
     private Action _deactivate;
 
     private CanvasGroup Cg => _cg != null ? _cg : (_cg = GetComponent<CanvasGroup>());
+
+    private FadeStyle ResolveStyle() => PanelStyle.Fade(_style) ?? CodeDefault;
 
     public void Show()
     {
@@ -30,10 +37,11 @@ public class FadeView : MonoBehaviour, IPanelView
         cg.interactable = true;
         cg.blocksRaycasts = true;
 
-        if (fadeIn)
+        var s = ResolveStyle();
+        if (s.FadeIn)
         {
             cg.alpha = 0f;
-            _alpha = LMotion.Create(0f, 1f, _fadeInDuration).Bind(cg, static (a, c) => c.alpha = a);
+            _alpha = LMotion.Create(0f, 1f, s.FadeInDuration).Bind(cg, static (a, c) => c.alpha = a);
         }
         else
         {
@@ -50,9 +58,10 @@ public class FadeView : MonoBehaviour, IPanelView
         cg.interactable = false;
         cg.blocksRaycasts = false;
 
-        if (fadeOut)
+        var s = ResolveStyle();
+        if (s.FadeOut)
         {
-            _alpha = LMotion.Create(cg.alpha, 0f, _fadeOutDuration)
+            _alpha = LMotion.Create(cg.alpha, 0f, s.FadeOutDuration)
                 .WithOnComplete(_deactivate ??= Deactivate)
                 .Bind(cg, static (a, c) => c.alpha = a);
         }

@@ -9,9 +9,9 @@ namespace VahTyah
     /// <see cref="OpenSettingsRequest"/>. Boot SAU ModuleSave/ModuleMusic/ModuleSound/ModuleHaptic
     /// vì view query trạng thái các module đó qua *Get event khi mở.
     /// </summary>
-    [CreateAssetMenu(menuName = "VahTyah/Modules/SettingsScreen", fileName = "Module_SettingsScreen")]
+    [CreateAssetMenu(menuName = "VahTyah/Modules/Settings", fileName = "Module_Settings")]
     [ModuleRequires(typeof(ModuleSave))]
-    public sealed class ModuleSettingsScreen : Module
+    public sealed class ModuleSettings : Module
     {
         [BoxGroup("Screen")]
         [Required(isError: true)]

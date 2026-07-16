@@ -505,8 +505,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 40, y: -24.35}
-  m_SizeDelta: {x: 0, y: 34.3}
+  m_AnchoredPosition: {x: 121.445, y: -24.35}
+  m_SizeDelta: {x: 162.89, y: 34.3}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &4771531365003677682
 CanvasRenderer:
@@ -749,6 +749,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3891845403845393882}
   - component: {fileID: 8775249721266523411}
+  - component: {fileID: 681038010663998638}
   m_Layer: 5
   m_Name: Replay
   m_TagString: Untagged
@@ -821,6 +822,20 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &681038010663998638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6505569269959095096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69edcfa376210d74abe5d06b99f828f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.InteractableFeedback
+  _visual: {fileID: 3891845403845393882}
+  _style: 0
 --- !u!1 &6620205742737930489
 GameObject:
   m_ObjectHideFlags: 0
@@ -831,6 +846,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7795753596549632906}
   - component: {fileID: 2031966873467449813}
+  - component: {fileID: 1056776033579341183}
   m_Layer: 5
   m_Name: Settings
   m_TagString: Untagged
@@ -903,6 +919,20 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1056776033579341183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6620205742737930489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69edcfa376210d74abe5d06b99f828f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.InteractableFeedback
+  _visual: {fileID: 7795753596549632906}
+  _style: 0
 --- !u!1 &7110478399279392177
 GameObject:
   m_ObjectHideFlags: 0
