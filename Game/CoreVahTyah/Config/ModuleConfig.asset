@@ -209,9 +209,9 @@ MonoBehaviour:
   - {fileID: 582891417146279429}
   - {fileID: -5687540653486838942}
   - {fileID: -9114549380049739641}
-  - {fileID: -675589074100092952}
   - {fileID: -5864541085533822240}
   - {fileID: 613586871771516639}
+  - {fileID: -675589074100092952}
   - {fileID: 9072522334924650911}
 --- !u!114 &582891417146279429
 MonoBehaviour:
@@ -262,9 +262,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6469b4f8820d0cb4fb8169269d812567, type: 3}
   m_Name: Module_Level
   m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleLevel
-  _config:
-    TotalLevels: 10
-    NonLoopLevels: []
+  levelDatabaseConfig: {fileID: 11400000, guid: aa64b8cbc393ef84da1df17ab06d95b9, type: 2}
+  nonLoopLevels: []
   _enableTestLevel: 0
   _testLevel: 1
   _displayPrefab: {fileID: 6285704383643877808, guid: 7766500426e3f4b0b846c59ec2ec658b, type: 3}

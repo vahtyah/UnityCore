@@ -5,16 +5,6 @@ using UnityEngine;
 namespace VahTyah
 {
     [Serializable]
-    public class LevelConfig
-    {
-        [Min(1)]
-        public int TotalLevels = 10;
-
-        [Tooltip("Khoảng level chỉ chơi 1 lần, không lặp.")]
-        public List<LevelRange> NonLoopLevels = new List<LevelRange>();
-    }
-
-    [Serializable]
     public class LevelRange
     {
         [Min(1)] public int From = 1;

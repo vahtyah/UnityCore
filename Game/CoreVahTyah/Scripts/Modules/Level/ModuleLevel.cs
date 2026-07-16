@@ -10,7 +10,10 @@ namespace VahTyah
     public sealed class ModuleLevel : Module
     {
         [BoxGroup("Config")]
-        [SerializeField] private LevelConfig _config = new LevelConfig();
+        [SerializeField] private LevelDatabaseConfig levelDatabaseConfig;
+        
+        [BoxGroup("Config")]
+        [SerializeField] private List<LevelRange> nonLoopLevels = new List<LevelRange>();
 
         [BoxGroup("Test Mode")]
         [SerializeField] private bool _enableTestLevel;
@@ -26,6 +29,8 @@ namespace VahTyah
         private LevelSaveData _save;
         private GameObject _displayInstance;
         private List<int> _loopPool;
+
+        private int _totalLevels => levelDatabaseConfig?.Levels?.Length ?? 0;
 
         // Loop pool chỉ phụ thuộc _config (cố định lúc runtime) → build 1 lần, cache lại.
         private List<int> LoopPool
@@ -44,16 +49,16 @@ namespace VahTyah
             get
             {
                 if (_enableTestLevel)
-                    return (_testLevel - 1) % Mathf.Max(1, _config.TotalLevels);
+                    return (_testLevel - 1) % Mathf.Max(1, _totalLevels);
 
-                if (Current <= _config.TotalLevels)
-                    return Mathf.Min(Current - 1, _config.TotalLevels - 1);
+                if (Current <= _totalLevels)
+                    return Mathf.Min(Current - 1, _totalLevels - 1);
 
                 List<int> pool = LoopPool;
                 if (pool.Count == 0)
-                    return _config.TotalLevels - 1;
+                    return _totalLevels - 1;
 
-                return pool[(Current - _config.TotalLevels - 1) % pool.Count];
+                return pool[(Current - _totalLevels - 1) % pool.Count];
             }
         }
 
@@ -139,11 +144,11 @@ namespace VahTyah
         private List<int> BuildLoopPool()
         {
             var pool = new List<int>();
-            for (int i = 0; i < _config.TotalLevels; i++)
+            for (int i = 0; i < _totalLevels; i++)
             {
                 int level = i + 1;
                 bool excluded = false;
-                foreach (var r in _config.NonLoopLevels)
+                foreach (var r in nonLoopLevels)
                 {
                     if (r.Contains(level)) { excluded = true; break; }
                 }
@@ -155,7 +160,7 @@ namespace VahTyah
         private void OnValidate()
         {
             _testLevel = Mathf.Max(1, _testLevel);
-            foreach (var r in _config.NonLoopLevels)
+            foreach (var r in nonLoopLevels)
             {
                 r.From = Mathf.Max(1, r.From);
                 r.To = Mathf.Max(r.From, r.To);
