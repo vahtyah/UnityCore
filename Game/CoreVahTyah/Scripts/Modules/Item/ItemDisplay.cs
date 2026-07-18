@@ -1,6 +1,8 @@
+using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
-using System.Collections;
 using System.Collections.Generic;
+using LitMotion;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,27 +17,58 @@ namespace VahTyah
 
         [Header("Change Animation")]
         [SerializeField] private bool _animateOnChange;
+        [Tooltip("Transform bị bump scale. Bỏ trống → dùng chính transform này. ĐỪNG để trỏ vào node có " +
+                 "LayoutGroup/ContentSizeFitter hoặc bị LayoutGroup cha đo (ChildScale) — scale sẽ làm layout rung. " +
+                 "Trỏ vào một child visual thuần (vd wrapper chứa icon+text, hoặc chính icon).")]
+        [SerializeField] private Transform _scaleTarget;
         [SerializeField] private AnimationCurve _increaseAnim = DefaultIncrease();
         [SerializeField] private AnimationCurve _decreaseAnim = DefaultDecrease();
 
         private static readonly List<ItemDisplay> _all = new List<ItemDisplay>();
 
         private int _lastValue;
-        private Coroutine _animCoroutine;
+        private Vector3 _baseScale = Vector3.one;
+        private AnimationCurve _activeCurve;
+        private MotionHandle _scaleMotion;
+        private CancellationTokenSource _scaleCts;
+
+        private void Awake()
+        {
+            // Bump vào _scaleTarget (visual riêng) thay vì node layout → không làm HorizontalLayoutGroup/
+            // ContentSizeFitter reflow khi scale. Bỏ trống thì fallback về transform (giữ hành vi cũ).
+            if (_scaleTarget == null) _scaleTarget = transform;
+
+            // Cache scale nghỉ đúng 1 lần. Nếu capture lại trong lúc đang phình (bump trước bị
+            // cancel giữa chừng) thì baseline dồn lên → to mãi không về.
+            _baseScale = _scaleTarget.localScale;
+        }
 
         private void OnEnable()
         {
             _all.Add(this);
+            this.On<ItemChanged>(e => { if (e.Key == _itemKey) OnChanged(); });
+            InitValueAsync().Forget();
+        }
+
+        // Giá trị đầu đọc qua query ItemGet — nhưng nếu HUD OnEnable chạy TRƯỚC khi ModuleItem.Subscribe
+        // (boot chưa xong) thì query chưa có listener → trả 0 → hiển thị 0 tới ItemChanged đầu tiên.
+        // Đợi tới khi ItemGet có listener rồi mới đọc để hiện đúng số đã load từ save.
+        private async UniTaskVoid InitValueAsync()
+        {
+            if (!EventBus.HasListeners<ItemGet>())
+                await UniTask.WaitUntil(
+                    static () => EventBus.HasListeners<ItemGet>(),
+                    cancellationToken: this.GetCancellationTokenOnDestroy());
+
             _lastValue = GetValue();
             Refresh();
-
-            this.On<ItemChanged>(e => { if (e.Key == _itemKey) OnChanged(); });
         }
 
         private void OnDisable()
         {
             _all.Remove(this);
-            if (_animCoroutine != null) StopCoroutine(_animCoroutine);
+            CancelScale();
+            _scaleTarget.localScale = _baseScale;
         }
 
         private void OnChanged()
@@ -46,11 +79,7 @@ namespace VahTyah
             Refresh();
 
             if (_animateOnChange && val != prev)
-            {
-                var curve = val > prev ? _increaseAnim : _decreaseAnim;
-                if (_animCoroutine != null) StopCoroutine(_animCoroutine);
-                _animCoroutine = StartCoroutine(ScaleRoutine(curve));
-            }
+                PlayScale(val > prev ? _increaseAnim : _decreaseAnim);
         }
 
         private void Refresh()
@@ -66,23 +95,40 @@ namespace VahTyah
             return result;
         }
 
-        private IEnumerator ScaleRoutine(AnimationCurve curve)
+        // Bump scale khi số đổi. LitMotion drive t: 0 → duration (linear, scaled time y hệt Time.deltaTime
+        // cũ); mỗi frame set localScale = _baseScale * curve.Evaluate(t); chạy hết thì về _baseScale.
+        // Đổi số lần nữa → cancel motion đang chạy rồi phát lại từ đầu (thay cho StopCoroutine).
+        private void PlayScale(AnimationCurve curve)
         {
-            if (curve == null || curve.length == 0) yield break;
+            CancelScale();
+            if (curve == null || curve.length == 0) return;
 
             float duration = curve.keys[curve.length - 1].time;
-            float elapsed = 0f;
-            Vector3 original = transform.localScale;
+            if (duration <= 0f) { _scaleTarget.localScale = _baseScale; return; }
 
-            while (elapsed < duration)
+            _activeCurve = curve;
+            _scaleCts = CancellationTokenSource.CreateLinkedTokenSource(this.GetCancellationTokenOnDestroy());
+            ScaleAsync(duration, _scaleCts.Token).Forget();
+        }
+
+        private async UniTaskVoid ScaleAsync(float duration, CancellationToken ct)
+        {
+            _scaleMotion = LMotion.Create(0f, duration, duration)
+                .Bind(this, static (t, self) => self._scaleTarget.localScale = self._baseScale * self._activeCurve.Evaluate(t));
+            try
             {
-                elapsed += Time.deltaTime;
-                transform.localScale = original * curve.Evaluate(elapsed);
-                yield return null;
+                await _scaleMotion.ToUniTask(ct);
+                _scaleTarget.localScale = _baseScale;   // chỉ reset khi chạy hết; bị cancel thì để motion mới tiếp quản
             }
+            catch (OperationCanceledException) { }
+        }
 
-            transform.localScale = original;
-            _animCoroutine = null;
+        private void CancelScale()
+        {
+            if (_scaleMotion.IsActive()) _scaleMotion.Cancel();
+            _scaleCts?.Cancel();
+            _scaleCts?.Dispose();
+            _scaleCts = null;
         }
 
         public static bool TryFind(string key, out Vector3 position)

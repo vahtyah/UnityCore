@@ -38,6 +38,18 @@ namespace VahTyah
             }
         }
 
+        public void Save<T>(string key, T data) where T : class
+        {
+            string json = JsonUtility.ToJson(data, false);
+            string path = GetPath(key);
+
+            string tempPath = path + ".tmp";
+            File.WriteAllText(tempPath, json);
+            if (File.Exists(path))
+                File.Delete(path);
+            File.Move(tempPath, path);
+        }
+
         public UniTask<T> LoadAsync<T>(string key) where T : class, new()
         {
             string path = GetPath(key);

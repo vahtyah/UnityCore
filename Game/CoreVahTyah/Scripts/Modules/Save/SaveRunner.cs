@@ -30,13 +30,13 @@ namespace VahTyah
 
         private void OnApplicationPause(bool paused)
         {
-            if (paused && _service != null)
-                _service.SaveAllAsync().Forget();
+            if (paused)
+                _service?.SaveAllImmediate();   // đồng bộ: OS có thể kill app ngay sau pause
         }
 
         private void OnApplicationQuit()
         {
-            _service?.SaveAllAsync().Forget();
+            _service?.SaveAllImmediate();        // đồng bộ: async fire-and-forget không kịp trước tear-down
         }
 
         private void OnDestroy()

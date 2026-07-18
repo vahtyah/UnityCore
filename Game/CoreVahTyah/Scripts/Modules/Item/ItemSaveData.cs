@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace VahTyah
 {
     [Serializable]
-    public class ItemSaveData
+    public class ItemSaveData : ISaveData
     {
         [Serializable]
         public class Entry
@@ -16,14 +16,26 @@ namespace VahTyah
 
         public List<Entry> Items = new List<Entry>();
 
+        // Cache tra cứu O(1). JsonUtility không serialize Dictionary nên đánh dấu NonSerialized
+        // và dựng lại từ List sau khi load (OnAfterLoad).
+        [NonSerialized] private Dictionary<string, Entry> _index;
+
+        public int Version => 1;
+
+        public void OnAfterLoad() => RebuildIndex();
+        public void OnBeforeSave() { }
+
+        private void RebuildIndex()
+        {
+            _index = new Dictionary<string, Entry>(Items.Count);
+            foreach (var e in Items)
+                _index[e.Key] = e;
+        }
+
         public bool TryGet(string key, out Entry entry)
         {
-            foreach (var e in Items)
-            {
-                if (e.Key == key) { entry = e; return true; }
-            }
-            entry = null;
-            return false;
+            if (_index == null) RebuildIndex();
+            return _index.TryGetValue(key, out entry);
         }
 
         public Entry GetOrCreate(string key)
@@ -33,6 +45,7 @@ namespace VahTyah
 
             var e = new Entry { Key = key };
             Items.Add(e);
+            _index[key] = e;
             return e;
         }
     }

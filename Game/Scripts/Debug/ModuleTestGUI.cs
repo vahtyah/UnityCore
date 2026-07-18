@@ -288,6 +288,15 @@ public class ModuleTestGUI : MonoBehaviour
         if (GUILayout.Button("+100", _button, GUILayout.Height(84f))) EventBus.Publish(new ItemAdd { Key = _itemKey, Value = 100 }).Forget();
         if (GUILayout.Button("−10", _button, GUILayout.Height(84f))) EventBus.Publish(new ItemAdd { Key = _itemKey, Value = -10 }).Forget();
         GUILayout.EndHorizontal();
+
+        GUILayout.Space(8f);
+        GUILayout.Label("Coin fly (từ giữa màn hình → ItemDisplay):", _sub);
+        GUILayout.BeginHorizontal();
+        // ItemCollect = add pending + animate + commit trong 1 event; From=null → bay từ giữa màn hình.
+        if (GUILayout.Button("Bay +10", _btnOn, GUILayout.Height(84f))) EventBus.Publish(new ItemCollect { Key = _itemKey, From = null, Value = 10 }).Forget();
+        if (GUILayout.Button("Bay +30", _btnOn, GUILayout.Height(84f))) EventBus.Publish(new ItemCollect { Key = _itemKey, From = null, Value = 30 }).Forget();
+        if (GUILayout.Button("Bay +100", _btnOn, GUILayout.Height(84f))) EventBus.Publish(new ItemCollect { Key = _itemKey, From = null, Value = 100 }).Forget();
+        GUILayout.EndHorizontal();
     }
 
     // ── Sound ─────────────────────────────────────────────

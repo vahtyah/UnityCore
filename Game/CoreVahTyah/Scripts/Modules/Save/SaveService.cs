@@ -109,6 +109,26 @@ namespace VahTyah
             _dirty = false;
         }
 
+        /// <summary>
+        /// Flush đồng bộ (blocking) mọi cache dirty. Dùng ở OnApplicationQuit/Pause — async
+        /// fire-and-forget không kịp chạy trước khi Editor/OS tear-down → mất save.
+        /// </summary>
+        public void SaveAllImmediate()
+        {
+            if (_active == null || !_dirty)
+                return;
+
+            foreach (var kvp in _cache)
+            {
+                if (kvp.Value is ISaveData saveData)
+                    saveData.OnBeforeSave();
+
+                _active.Save(kvp.Key, kvp.Value);
+            }
+
+            _dirty = false;
+        }
+
         public async UniTask DeleteAsync(string key)
         {
             _cache.Remove(key);
