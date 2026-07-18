@@ -8,11 +8,18 @@ using Debug = UnityEngine.Debug;
 namespace VahTyah
 {
     [CreateAssetMenu(menuName = "VahTyah/Modules/Heart", fileName = "Module_Heart")]
-    [ModuleRequires(typeof(ModuleSave))]
+    [ModuleRequires(typeof(ModuleSave), typeof(ModuleCollectFly))]
     public sealed class ModuleHeart : Module
     {
         [BoxGroup("Settings")] [Min(1)] public int MaxHearts = 5;
         [BoxGroup("Settings")] [Min(0.01f)] public float MinutesPerHeart = 1f;
+
+        [BoxGroup("Collect Animation")]
+        [Tooltip("Prefab tim bay (UI Image + RectTransform) cho HeartCollect. Thiếu → cộng thẳng.")]
+        public GameObject FlyPrefab;
+        [BoxGroup("Collect Animation")]
+        [Tooltip("Profile animation, khai báo ở ModuleCollectFly.")]
+        public CollectAnimId Animation = CollectAnimId.Default;
 
         private const string SaveKey = "hearts";
 
@@ -35,6 +42,9 @@ namespace VahTyah
             go.hideFlags = HideFlags.HideInHierarchy;
             go.AddComponent<HeartTicker>().Initialize(this);
 
+            if (FlyPrefab != null)
+                Services.Get<CollectFlyService>().Prewarm(FlyPrefab, Animation);
+
             return UniTask.CompletedTask;
         }
 
@@ -48,13 +58,36 @@ namespace VahTyah
             EventBus.On<HeartGetTimer>(e => e.Reply?.Invoke(GetTimerDisplay()));
             EventBus.On<HeartAddInfinity>(OnAddInfinity);
             EventBus.On<HeartGetInfinityTimer>(e => e.Reply?.Invoke(GetInfinityDisplay()));
+            EventBus.OnAsync<HeartCollect>(OnHeartCollect);
+        }
+
+        private UniTask OnHeartCollect(HeartCollect e)
+        {
+            if (e.Value <= 0) return UniTask.CompletedTask;
+
+            if (FlyPrefab == null || !HeartDisplay.TryFind(out var target))
+            {
+                OnAdd(new HeartAdd { Value = e.Value, Direct = e.Direct });   // không bay được → cộng thẳng
+                return UniTask.CompletedTask;
+            }
+
+            Vector3 start = e.From != null
+                ? e.From.position
+                : new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0f);
+
+            // Mỗi tim đáp → +iv (tim không có pending bucket, cộng thẳng khi chạm).
+            return Services.Get<CollectFlyService>().Fly(FlyPrefab, start, target, Animation, e.Value,
+                iv => OnAdd(new HeartAdd { Value = iv, Direct = e.Direct }));
         }
 
         private void OnAdd(HeartAdd e)
         {
             bool wasFull = IsFull();
 
-            _save.Hearts = Mathf.Min(_save.Hearts + e.Value, MaxHearts);
+            // Direct = cộng vượt MaxHearts (thưởng đặc biệt); mặc định cap ở MaxHearts.
+            _save.Hearts = e.Direct
+                ? _save.Hearts + e.Value
+                : Mathf.Min(_save.Hearts + e.Value, MaxHearts);
 
             if (!wasFull && IsFull())
                 UpdateTimestamps();
@@ -66,6 +99,12 @@ namespace VahTyah
 
         private void OnUse(HeartUse e)
         {
+            if (IsInfinity())   // đang vô hạn tim → dùng luôn thành công, KHÔNG trừ tim
+            {
+                e.Reply?.Invoke(true);
+                return;
+            }
+
             if (_save.Hearts < e.Value)
             {
                 e.Reply?.Invoke(false);
@@ -188,17 +227,19 @@ namespace VahTyah
             Persist();
         }
 
+        // Timer gộp (1 field): infinity → "∞ + giờ", full → "Full", else đếm ngược.
         private string GetTimerDisplay()
         {
-            if (IsInfinity()) return GetInfinityDisplay();
+            if (IsInfinity()) return "∞ " + GetInfinityDisplay();
             if (IsFull()) return "Full";
             return FormatTime(TimeSpan.FromSeconds(GetNextHeartSeconds()));
         }
 
+        // Giờ còn của infinity — THÔ (không ∞), để display tự quyết cách trình bày (vd count = "∞", timer = giờ).
         private string GetInfinityDisplay()
         {
             double remaining = GetInfinityRemaining();
-            return remaining > 0 ? "∞ " + FormatTime(TimeSpan.FromSeconds(remaining)) : "";
+            return remaining > 0 ? FormatTime(TimeSpan.FromSeconds(remaining)) : string.Empty;
         }
 
         private void UpdateTimestamps()

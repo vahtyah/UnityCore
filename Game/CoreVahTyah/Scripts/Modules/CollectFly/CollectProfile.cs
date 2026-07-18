@@ -3,23 +3,23 @@ using UnityEngine;
 
 namespace VahTyah
 {
-    /// <summary>Kiểu hành vi animation khi thu item.</summary>
-    public enum ItemAnimationStyle
+    /// <summary>Kiểu hành vi khi bay về counter.</summary>
+    public enum CollectFlyStyle
     {
-        FlyToTarget, // bay Bezier từ điểm nguồn tới icon ItemDisplay (coin/gem)
-        PopInPlace,  // bung tại chỗ ItemDisplay, không bay ngang màn (booster/gift)
-        None,        // không animation, cộng thẳng vào Current
+        FlyToTarget, // bay Bezier từ điểm nguồn tới đích (coin/gem/heart)
+        PopInPlace,  // bung tại chỗ đích, không bay ngang màn (booster/gift)
+        None,        // không animation, callback ngay với nguyên value
     }
 
     /// <summary>
-    /// Một profile animation dùng chung: định nghĩa 1 lần trong <see cref="ModuleItem"/>, item chọn bằng
-    /// <see cref="ItemAnimationId"/>. Chỉnh 1 chỗ → mọi item cùng Id ăn theo. Nên có 1 profile Id=Default.
+    /// Profile animation dùng chung: khai báo 1 lần ở <see cref="ModuleCollectFly"/>, caller chọn bằng
+    /// <see cref="CollectAnimId"/>. Chỉnh 1 chỗ → mọi counter cùng Id ăn theo. Nên có 1 profile Id=Default.
     /// </summary>
     [Serializable]
-    public class ItemAnimationProfile
+    public class CollectProfile
     {
-        public ItemAnimationId Id;
-        public ItemAnimationStyle Style = ItemAnimationStyle.FlyToTarget;
+        public CollectAnimId Id;
+        public CollectFlyStyle Style = CollectFlyStyle.FlyToTarget;
         public float SpawnRadius = 120f;
         public float StaggerDelay = 0.04f;
         public float Duration = 1f;

@@ -260,6 +260,7 @@ public class ModuleTestGUI : MonoBehaviour
         GUILayout.EndHorizontal();
 
         if (Btn("+5")) EventBus.Publish(new HeartAdd { Value = 5 }).Forget();
+        if (Btn("Collect +5  (bay từ giữa màn)")) EventBus.Publish(new HeartCollect { From = null, Value = 5 }).Forget();
         if (Btn("Infinity  +30 phút")) EventBus.Publish(new HeartAddInfinity { Minutes = 30f }).Forget();
     }
 

@@ -7,50 +7,27 @@ using UnityEngine;
 
 namespace VahTyah
 {
-    public class ItemAnimationRunner : MonoBehaviour
+    /// <summary>
+    /// Component trên canvas <c>[CollectFly]</c>: bay N sprite pooled (PoolService) từ <c>start</c> → <c>targetPos</c>,
+    /// gọi <c>onPieceLanded(pieceValue)</c> MỖI mảnh đáp. KHÔNG biết item/heart/currency — việc cộng số do caller
+    /// xử lý qua callback (commit pending / add heart / ...). Register gián tiếp qua <see cref="CollectFlyService"/>.
+    /// </summary>
+    public class CollectFlyRunner : MonoBehaviour
     {
-        private ModuleItem _config;
-
-        internal void Initialize(ModuleItem config)
+        internal void Prewarm(GameObject prefab, int size)
         {
-            _config = config;
+            if (prefab != null) Pool.Register(prefab, Mathf.Max(1, size));
         }
 
-        // Đăng ký sẵn pool (dùng chung PoolService) cho mọi item có Prefab; prewarm theo MaxPoolSize của profile.
-        internal void Prewarm()
+        public async UniTask Fly(GameObject prefab, Vector3 start, Vector3 targetPos,
+            CollectProfile profile, int value, Action<int> onPieceLanded)
         {
-            foreach (var def in _config.Items)
+            if (prefab == null || profile == null || profile.Style == CollectFlyStyle.None)
             {
-                if (def.Prefab == null) continue;
-                var p = _config.GetProfile(def.Animation);
-                Pool.Register(def.Prefab, Mathf.Max(1, p.MaxPoolSize));
-            }
-        }
-
-        public async UniTask Play(string itemKey, Vector3 start, int value)
-        {
-            var def = _config.FindItem(itemKey);
-            if (def == null || def.Prefab == null)
-            {
-                CommitAll(itemKey, value);   // không tìm thấy item / thiếu Prefab → cộng thẳng
+                onPieceLanded?.Invoke(value);   // không bay → callback nguyên value
                 return;
             }
 
-            var profile = _config.GetProfile(def.Animation);
-
-            if (profile.Style == ItemAnimationStyle.None)
-            {
-                CommitAll(itemKey, value);   // profile None → cộng thẳng, không animation
-                return;
-            }
-
-            if (!ItemDisplay.TryFind(itemKey, out var targetPos))
-            {
-                CommitAll(itemKey, value);   // không có ItemDisplay → cộng thẳng
-                return;
-            }
-
-            // PoolService auto-grow nên chỉ cap số mảnh bay = MaxPoolSize; value chia đều, dư rải vào mảnh đầu.
             int maxPool = Mathf.Max(1, profile.MaxPoolSize);
             int count = Mathf.Clamp(value, 1, maxPool);
             int perItem = value / count;
@@ -62,16 +39,16 @@ namespace VahTyah
 
             for (int i = 0; i < count; i++)
             {
-                int itemValue = perItem + (i < remainder ? 1 : 0);
+                int pieceValue = perItem + (i < remainder ? 1 : 0);
                 float radius = count > 1 ? profile.SpawnRadius : 0f;
                 float delay = i * profile.StaggerDelay;
 
                 Vector3 spawn, ctrl0, ctrl1, target;
                 float dur;
 
-                if (profile.Style == ItemAnimationStyle.PopInPlace)
+                if (profile.Style == CollectFlyStyle.PopInPlace)
                 {
-                    // Bung tại chỗ: đứng yên ngay ItemDisplay (rải nhẹ nếu nhiều mảnh), chỉ scale-pop.
+                    // Bung tại chỗ: đứng yên ngay đích (rải nhẹ nếu nhiều mảnh), chỉ scale-pop.
                     spawn = targetPos + (Vector3)(UnityEngine.Random.insideUnitCircle * radius);
                     ctrl0 = ctrl1 = target = spawn;   // Bezier(spawn,spawn,spawn,spawn) = đứng yên
                     dur = profile.Duration;
@@ -94,21 +71,21 @@ namespace VahTyah
                     dur = profile.Duration * Mathf.Lerp(0.35f, 1f, Mathf.Clamp01(mag / screenDiag));
                 }
 
-                tasks.Add(AnimateOne(def.Prefab, itemKey, itemValue, spawn, ctrl0, ctrl1, target, profile, delay, dur, ct));
+                tasks.Add(AnimateOne(prefab, pieceValue, spawn, ctrl0, ctrl1, target, profile, delay, dur, onPieceLanded, ct));
             }
 
             await UniTask.WhenAll(tasks);
         }
 
         // Bay/bung 1 mảnh: (tuỳ) delay stagger → Spawn từ Pool → LitMotion drive t:0→1 (scaled time) set
-        // position theo Bezier + scale theo ScaleCurve. Commit + Despawn trong finally để chạy hết là không
-        // rò pending; bị destroy lúc tear-down (go fake-null) thì bỏ qua, ModuleItem reconcile Pending lần load sau.
-        private async UniTask AnimateOne(GameObject prefab, string itemKey, int itemValue,
+        // position theo Bezier + scale theo ScaleCurve. onPieceLanded + feedback + Despawn trong finally để chạy
+        // hết là không rò; bị destroy lúc tear-down (go fake-null) thì bỏ qua (caller reconcile nếu cần).
+        private async UniTask AnimateOne(GameObject prefab, int pieceValue,
             Vector3 spawn, Vector3 ctrl0, Vector3 ctrl1, Vector3 target,
-            ItemAnimationProfile profile, float delay, float duration, CancellationToken ct)
+            CollectProfile profile, float delay, float duration, Action<int> onPieceLanded, CancellationToken ct)
         {
-            var move = profile.MoveCurve ?? ItemAnimationProfile.DefaultMove();
-            var scale = profile.ScaleCurve ?? ItemAnimationProfile.DefaultScale();
+            var move = profile.MoveCurve ?? CollectProfile.DefaultMove();
+            var scale = profile.ScaleCurve ?? CollectProfile.DefaultScale();
 
             GameObject go = null;
             try
@@ -139,7 +116,7 @@ namespace VahTyah
             {
                 if (go != null)   // Unity: false nếu chưa spawn (cancel lúc delay) hoặc đã destroy (tear-down)
                 {
-                    EventBus.Publish(new ItemCommitPending { Key = itemKey, Value = itemValue }).Forget();
+                    onPieceLanded?.Invoke(pieceValue);
                     PlayCollectFeedback(profile, target);
                     Pool.Despawn(go);
                 }
@@ -148,19 +125,13 @@ namespace VahTyah
 
         // Phát mỗi khi 1 mảnh chạm đích. Shortcut Sound/Haptic/Particles đều null-safe (no-op nếu module chưa boot).
         // Haptic mặc định không force → HapticService tự gate bằng cooldown, tránh spam khi nhiều mảnh đáp dồn.
-        private static void PlayCollectFeedback(ItemAnimationProfile p, Vector3 target)
+        private static void PlayCollectFeedback(CollectProfile p, Vector3 target)
         {
             if (p.CollectSound != SoundId.None) Sound.Play(p.CollectSound);
             if (p.CollectHaptic != HapticType.None) Haptic.Play(p.CollectHaptic);
-            // target là screen-px (canvas overlay). Particles.Play spawn world-space → chỉ khớp nếu effect
-            // được author theo toạ độ này / game map screen≈world; nếu lệch cần ScreenToWorld (xem chú thích).
+            // target là screen-px (canvas overlay). Particles.Play spawn world-space → chỉ khớp nếu effect được
+            // author theo toạ độ này / game map screen≈world; nếu lệch cần ScreenToWorld.
             if (p.CollectParticle != ParticleId.None) Particles.Play(p.CollectParticle, target);
-        }
-
-        private static void CommitAll(string key, int value)
-        {
-            if (value > 0)
-                EventBus.Publish(new ItemCommitPending { Key = key, Value = value }).Forget();
         }
 
         private static Vector3 CubicBezier(Vector3 a, Vector3 c0, Vector3 c1, Vector3 b, float t)

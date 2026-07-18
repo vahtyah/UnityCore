@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace VahTyah
 {
@@ -12,4 +13,8 @@ namespace VahTyah
     public struct HeartGetInfinityTimer : IEvent { public Action<string> Reply; }
     public struct HeartChanged : IEvent { }
     public struct HeartInfinityChanged : IEvent { }
+
+    /// <summary>Thu tim có animation bay về HeartDisplay (mua bundle, reward...). Mỗi tim đáp → +1.
+    /// Direct = cộng vượt MaxHearts. Không có ItemDisplay/prefab → cộng thẳng.</summary>
+    public struct HeartCollect : IEvent { public Transform From; public int Value; public bool Direct; }
 }

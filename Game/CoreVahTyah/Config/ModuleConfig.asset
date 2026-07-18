@@ -36,6 +36,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleHeart
   MaxHearts: 5
   MinutesPerHeart: 1
+  FlyPrefab: {fileID: 6709927171201799375, guid: 60446329e550e1f46b710ddf140b4cdd, type: 3}
+  Animation: 0
 --- !u!114 &-7007098414862035835
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -254,10 +256,110 @@ MonoBehaviour:
   - {fileID: 9072522334924650911}
   - {fileID: 7790439949304028110}
   - {fileID: -7007098414862035835}
-  - {fileID: 7936823019446891407}
   - {fileID: -5475724099778134868}
   - {fileID: 5869105738471141159}
+  - {fileID: 201471467427412062}
+  - {fileID: 7936823019446891407}
   - {fileID: -7834782502262248060}
+--- !u!114 &201471467427412062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f165340fc7337043baeb9c1647ea040, type: 3}
+  m_Name: Module_CollectFly
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleCollectFly
+  Profiles:
+  - Id: 0
+    Style: 0
+    SpawnRadius: 120
+    StaggerDelay: 0.04
+    Duration: 1
+    CurveStrength: 400
+    MoveCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.4
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 4.8
+        outSlope: 4.8
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    ScaleCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.4
+        inSlope: 12
+        outSlope: 12
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.1
+        value: 1.5
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.5
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0.5
+        inSlope: -12
+        outSlope: -12
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    MaxPoolSize: 20
+    CollectSound: 0
+    CollectHaptic: -1
+    CollectParticle: 0
+  CanvasSortingOrder: 20
 --- !u!114 &582891417146279429
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -411,90 +513,6 @@ MonoBehaviour:
     Prefab: {fileID: 6709927171201799375, guid: 557855160140629419284bcdcbff92d0, type: 3}
     StartAmount: 0
     Animation: 0
-  AnimationProfiles:
-  - Id: 0
-    Style: 1
-    SpawnRadius: 120
-    StaggerDelay: 0.04
-    Duration: 1
-    CurveStrength: 400
-    MoveCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 0.4
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 4.8
-        outSlope: 4.8
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ScaleCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0.4
-        inSlope: 12
-        outSlope: 12
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 0.1
-        value: 1.5
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 0.5
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0.5
-        inSlope: -12
-        outSlope: -12
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    MaxPoolSize: 20
-  CanvasSortingOrder: 20
 --- !u!114 &8090727097232892441
 MonoBehaviour:
   m_ObjectHideFlags: 0
