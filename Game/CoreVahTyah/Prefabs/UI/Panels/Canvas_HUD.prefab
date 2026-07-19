@@ -10,6 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 7738115344772735321}
   - component: {fileID: 6458222883394918153}
+  - component: {fileID: 6111297612530983368}
+  - component: {fileID: 6285768738432891114}
+  - component: {fileID: 6691206643560108988}
   m_Layer: 5
   m_Name: Coin
   m_TagString: Untagged
@@ -52,7 +55,44 @@ MonoBehaviour:
   _itemKey: coin
   _valueText: {fileID: 378841024635362980}
   _iconImage: {fileID: 4097195771934388960}
-  _animateOnChange: 1
+  _feedback: {fileID: 6285768738432891114}
+--- !u!223 &6111297612530983368
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 240256790081913172}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 1
+  m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
+--- !u!114 &6285768738432891114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 240256790081913172}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f649496c2d65e44995b90dbb9f3924c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.CounterFeedback
+  _animateOnIncrease: 1
+  _animateOnDecrease: 1
   _scaleTarget: {fileID: 0}
   _increaseAnim:
     serializedVersion: 2
@@ -120,6 +160,26 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _canvas: {fileID: 6111297612530983368}
+  _raiseSortingOnAnimate: 1
+  _raisedSortingOrder: 9999
+--- !u!114 &6691206643560108988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 240256790081913172}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!1 &978776656845778800
 GameObject:
   m_ObjectHideFlags: 0
@@ -235,7 +295,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 6e72656b
+  m_ActiveFontFeatures: 
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -702,13 +762,13 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 6e72656b
+  m_ActiveFontFeatures: 
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -871,7 +931,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8607921075994321938}
+  - component: {fileID: 2304191940677907833}
   - component: {fileID: 8618902046244989728}
+  - component: {fileID: 1903771079846571934}
+  - component: {fileID: 4941206894219848663}
   m_Layer: 5
   m_Name: Heart
   m_TagString: Untagged
@@ -899,6 +962,29 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 138.63, y: 65.6}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!223 &2304191940677907833
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4278934587534103015}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 1
+  m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
 --- !u!114 &8618902046244989728
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -915,7 +1001,21 @@ MonoBehaviour:
   _timerText: {fileID: 4808308630375196047}
   _iconImage: {fileID: 3681289909019016589}
   _refreshInterval: 1
-  _animateOnChange: 1
+  _feedback: {fileID: 1903771079846571934}
+--- !u!114 &1903771079846571934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4278934587534103015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f649496c2d65e44995b90dbb9f3924c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.CounterFeedback
+  _animateOnIncrease: 1
+  _animateOnDecrease: 1
   _scaleTarget: {fileID: 0}
   _increaseAnim:
     serializedVersion: 2
@@ -983,6 +1083,26 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _canvas: {fileID: 2304191940677907833}
+  _raiseSortingOnAnimate: 1
+  _raisedSortingOrder: 9999
+--- !u!114 &4941206894219848663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4278934587534103015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!1 &4745016589009014858
 GameObject:
   m_ObjectHideFlags: 0
@@ -1420,13 +1540,13 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 6e72656b
+  m_ActiveFontFeatures: 
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -1674,7 +1794,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69edcfa376210d74abe5d06b99f828f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VahTyah.InteractableFeedback
-  _visual: {fileID: 3891845403845393882}
+  _target: {fileID: 0}
   _style: 0
 --- !u!1 &6620205742737930489
 GameObject:
@@ -1771,7 +1891,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69edcfa376210d74abe5d06b99f828f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VahTyah.InteractableFeedback
-  _visual: {fileID: 7795753596549632906}
+  _target: {fileID: 0}
   _style: 0
 --- !u!1 &6787113392563381503
 GameObject:
@@ -1994,9 +2114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cee5dbbd20aff7145856b9b75238aade, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VahTyah.LevelDisplay
-  _texts:
-  - {fileID: 3776723623637831723}
-  - {fileID: 0}
+  text: {fileID: 3776723623637831723}
   _prefix: Level
 --- !u!1 &7945448607506192627
 GameObject:
@@ -2292,5 +2410,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cee5dbbd20aff7145856b9b75238aade, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VahTyah.LevelDisplay
-  _texts: []
+  text: {fileID: 0}
   _prefix: Level

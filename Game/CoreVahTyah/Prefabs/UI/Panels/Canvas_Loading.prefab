@@ -569,7 +569,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VahTyah.LoadingScreen
   _fillRect: {fileID: 6439385348320876404}
   _percentText: {fileID: 5977630769480155532}
-  _introDuration: 1
+  _introDuration: 0.1
   _introTarget: 0.85
   _introCurve:
     serializedVersion: 2
@@ -597,5 +597,5 @@ MonoBehaviour:
     m_RotationOrder: 4
   waitIntroDuration: 0.1
   _minLoadingTime: 1.5
-  _fillSpeed: 1.5
+  _fillSpeed: 3
   _fullWidth: 651.2

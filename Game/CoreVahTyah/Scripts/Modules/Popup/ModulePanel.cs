@@ -7,7 +7,7 @@ namespace VahTyah
 {
     /// <summary>
     /// Factory mỏng: register <see cref="PanelStyleService"/> vào <see cref="Services"/> để mọi
-    /// <see cref="IPanelAnimator"/> dùng chung cấu hình animation. Hai loại style riêng:
+    /// <see cref="PanelAnimator"/> dùng chung cấu hình animation. Hai loại style riêng:
     /// <see cref="PopupStyle"/> (PopupAnimator) và <see cref="FadeStyle"/> (FadeAnimator).
     /// Không nghe event, không giữ state. Chỉnh 1 chỗ (asset này) → mọi panel ăn theo.
     /// </summary>

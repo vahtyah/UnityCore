@@ -12,7 +12,7 @@ using VahTyah;
 /// Only _panel (per-instance scene ref) and _style live here.
 /// </summary>
 [RequireComponent(typeof(CanvasGroup))]
-public class PopupAnimator : MonoBehaviour, IPanelAnimator
+public class PopupAnimator : PanelAnimator
 {
     [Tooltip("Shared popup style from ModulePanel. Missing service/profile → code default.")]
     [SerializeField] private PopupStyleId _style = PopupStyleId.Default;
@@ -33,7 +33,7 @@ public class PopupAnimator : MonoBehaviour, IPanelAnimator
 
     private PopupStyle ResolveStyle() => PanelStyle.Popup(_style) ?? CodeDefault;
 
-    public void Show()
+    public override void Show()
     {
         CancelMotions();
         gameObject.SetActive(true);
@@ -56,7 +56,7 @@ public class PopupAnimator : MonoBehaviour, IPanelAnimator
         }
     }
 
-    public void Hide()
+    public override void Hide()
     {
         var style = ResolveStyle();
 

@@ -19,7 +19,7 @@ namespace VahTyah
         [Tooltip("Profile animation dùng chung. Nên có 1 profile Id=Default làm fallback.")]
         public List<CollectProfile> Profiles = new List<CollectProfile> { new CollectProfile() };
 
-        [BoxGroup("Canvas")] public int CanvasSortingOrder = 20;
+        [BoxGroup("Canvas")] public int CanvasSortingOrder = 9999;
 
         public override UniTask InitializeAsync(Transform holder)
         {
@@ -36,7 +36,8 @@ namespace VahTyah
             scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
             scaler.matchWidthOrHeight = 0.5f;
 
-            canvasObj.AddComponent<GraphicRaycaster>();
+            // KHÔNG GraphicRaycaster: overlay thuần trang trí. Ở sortingOrder cao (9999) mà có raycaster thì
+            // sprite bay (raycastTarget mặc định true) sẽ nuốt tap dọc đường bay, đè lên mọi UI bên dưới.
 
             var runner = canvasObj.AddComponent<CollectFlyRunner>();
             Services.Register(new CollectFlyService(runner, Profiles));

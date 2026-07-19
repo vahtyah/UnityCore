@@ -2,41 +2,32 @@ using System;
 using LitMotion;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
+using VahTyah.Inspector;
 
 namespace VahTyah
 {
-    /// <summary>
-    /// Feedback khi nhấn cho UI bấm được (button / toggle / tile...): scale nhấn/thả/nảy (LitMotion)
-    /// + haptic/sound khi click. THUẦN FEEDBACK — không tự gọi hành động; logic do Unity Button/Toggle
-    /// trên cùng GameObject xử lý. Thông số lấy từ <see cref="InteractableStyleService"/> theo <see cref="_style"/>
-    /// (chỉnh chung ở <see cref="ModuleInteractable"/>); thiếu module → code default. Scale áp lên
-    /// <see cref="_visual"/> (mặc định = child đầu) để không đụng hitbox RectTransform.
-    /// </summary>
     [DisallowMultipleComponent]
     public class InteractableFeedback : MonoBehaviour,
         IPointerDownHandler, IPointerUpHandler, IPointerClickHandler
     {
-        [Tooltip("Transform bị scale. Bỏ trống → tự lấy child đầu tiên lúc Awake (giữ nguyên hitbox).")]
-        [SerializeField] private Transform _visual;
+        [BoxGroup("Feedback")]
+        [SerializeField] private Transform _target;
 
-        [Tooltip("Style dùng chung, tra từ ModuleInteractable theo id này.")]
+        [BoxGroup("Feedback")]
         [SerializeField] private InteractableStyleId _style = InteractableStyleId.Default;
 
-        // Default trong code khi chưa có ModuleInteractable (field initializer dựng sẵn curve/feedback).
         private static InteractableStyleProfile _codeDefault;
         private static InteractableStyleProfile CodeDefault => _codeDefault ??= new InteractableStyleProfile();
 
-        private Transform _target;
         private Vector3 _originalScale = Vector3.one;
-        private float _factor = 1f;              // hệ số scale hiện tại (× _originalScale)
+        private float _factor = 1f;
         private MotionHandle _motion;
-        private InteractableStyleProfile _active;   // style của interaction hiện tại
+        private InteractableStyleProfile _active;
 
         private void Awake()
         {
-            if (_visual == null && transform.childCount > 0)
-                _visual = transform.GetChild(0);
-            _target = _visual != null ? _visual : transform;
+            if (_target == null) _target = transform;
         }
 
         private void Start() => _originalScale = _target.localScale;

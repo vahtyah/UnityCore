@@ -32,7 +32,7 @@ namespace VahTyah
 
         public override UniTask InitializeAsync(Transform holder)
         {
-            _inFlight.Clear();   // SO giữ state runtime giữa các lần Play trong Editor → dọn khi init
+            _inFlight.Clear();
 
             var saveService = Services.Get<SaveService>();
             _save = saveService.Load<ItemSaveData>(SaveKey);
@@ -43,8 +43,6 @@ namespace VahTyah
                     _save.GetOrCreate(def.Key).Current = def.StartAmount;
             }
 
-            // Reconcile Pending mồ côi: item đang bay lúc app bị kill → _inFlight (không save) mất,
-            // còn Pending (save) kẹt lại. Gộp thẳng vào Current để không mất; luôn zero Pending lúc boot.
             foreach (var entry in _save.Items)
             {
                 if (entry.Pending > 0)
@@ -53,7 +51,6 @@ namespace VahTyah
             }
             Persist();
 
-            // Prewarm pool cho từng item qua service bay dùng chung.
             var fly = Services.Get<CollectFlyService>();
             foreach (var def in Items)
                 if (def.Prefab != null)
@@ -78,7 +75,7 @@ namespace VahTyah
             if (e.Pending)
                 entry.Pending += e.Value;
             else
-                entry.Current = Mathf.Max(0, entry.Current + e.Value);   // Current không xuống âm
+                entry.Current = Mathf.Max(0, entry.Current + e.Value);
 
             Persist();
             EventBus.Publish(new ItemChanged { Key = e.Key }).Forget();
@@ -86,7 +83,6 @@ namespace VahTyah
 
         private void OnGet(ItemGet e)
         {
-            // Query thuần: không GetOrCreate để tránh tạo entry rỗng khi chỉ đọc.
             int current = 0, pending = 0;
             if (_save.TryGet(e.Key, out var entry)) { current = entry.Current; pending = entry.Pending; }
             _inFlight.TryGetValue(e.Key, out int flight);
