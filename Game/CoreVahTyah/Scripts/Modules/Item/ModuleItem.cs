@@ -64,7 +64,7 @@ namespace VahTyah
             EventBus.On<ItemAdd>(OnAdd, -10);
             EventBus.On<ItemGet>(OnGet);
             EventBus.On<ItemCommitPending>(OnCommitPending, -10);
-            EventBus.OnAsync<ItemAnimationPlay>(OnAnimationPlay);
+            EventBus.OnAsync<ItemFlyPending>(OnFlyPending);
             EventBus.OnAsync<ItemCollect>(OnCollect);
             EventBus.On<ItemTrySpend>(OnTrySpend, -10);
         }
@@ -105,18 +105,23 @@ namespace VahTyah
                 EventBus.Publish(new ItemChanged { Key = e.Key }).Forget();
         }
 
-        private UniTask OnAnimationPlay(ItemAnimationPlay e)
+        private UniTask OnFlyPending(ItemFlyPending e)
         {
-            if (e.Value <= 0) return UniTask.CompletedTask;
-
             _inFlight.TryGetValue(e.Key, out int flight);
-            _inFlight[e.Key] = flight + e.Value;
+            int available = _save.TryGet(e.Key, out var entry) ? entry.Pending - flight : 0;
+
+            // Value > 0 → bay đúng Value (clamp theo pending chưa bay cho chắc);
+            // Value <= 0 → bay TẤT CẢ pending chưa bay. Nguồn chân lý là Pending → không desync.
+            int amount = e.Value > 0 ? Mathf.Min(e.Value, available) : available;
+            if (amount <= 0) return UniTask.CompletedTask;
+
+            _inFlight[e.Key] = flight + amount;
 
             var def = FindItem(e.Key);
             if (def?.Prefab == null || !ItemDisplay.TryFind(e.Key, out var target))
             {
                 // Không bay được → commit thẳng (pending → current), không mất.
-                EventBus.Publish(new ItemCommitPending { Key = e.Key, Value = e.Value }).Forget();
+                EventBus.Publish(new ItemCommitPending { Key = e.Key, Value = amount }).Forget();
                 return UniTask.CompletedTask;
             }
 
@@ -125,7 +130,7 @@ namespace VahTyah
                 : new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0f);
 
             // Mỗi mảnh đáp → commit pending phần của mảnh đó (currency logic ở LẠI ModuleItem).
-            return Services.Get<CollectFlyService>().Fly(def.Prefab, start, target, def.Animation, e.Value,
+            return Services.Get<CollectFlyService>().Fly(def.Prefab, start, target, def.Animation, amount,
                 iv => EventBus.Publish(new ItemCommitPending { Key = e.Key, Value = iv }).Forget());
         }
 
@@ -135,7 +140,7 @@ namespace VahTyah
             if (e.Value <= 0) return UniTask.CompletedTask;
 
             OnAdd(new ItemAdd { Key = e.Key, Value = e.Value, Pending = true });
-            return OnAnimationPlay(new ItemAnimationPlay { Key = e.Key, From = e.From, Value = e.Value });
+            return OnFlyPending(new ItemFlyPending { Key = e.Key, From = e.From, Value = e.Value });
         }
 
         private void OnTrySpend(ItemTrySpend e)

@@ -68,9 +68,13 @@ API surface để module giao tiếp. Tất cả là `struct : IEvent`. Publish 
 | `ItemGet` | Query | `string Key; bool Pending; Action<int> Reply` | Lấy số lượng (trừ `_inFlight` nếu Pending) |
 | `ItemCommitPending` | Cmd | `string Key; int Value` | Chuyển pending → current |
 | `ItemChanged` | Notify | `string Key` | Số lượng item đổi |
-| `ItemAnimationPlay` | Cmd | `string Key; Transform From; int Value` | Chạy animation item bay (coin fly) |
+| `ItemFlyPending` | Cmd | `string Key; Transform From; int Value` | Bay pending vào counter + commit. `Value>0`→ bay đúng Value (clamp theo pending chưa bay); `Value<=0`→ bay TẤT CẢ pending chưa bay của Key |
+| `ItemCollect` | Cmd | `string Key; Transform From; int Value` | Combo an toàn: add pending + `ItemFlyPending` trong 1 nhịp (tránh desync). Dùng khi thu item có sẵn (không cần secure trước) |
+| `ItemTrySpend` | Query | `string Key; int Value; Action<bool> Reply` | Tiêu nguyên tử: đủ → trừ + Reply(true); thiếu → không trừ + Reply(false) |
 
 > **Pending pattern**: khi thưởng item có animation bay, cộng vào `Pending` + đưa `_inFlight`; animation chạy xong mới `CommitPending` sang `Current`. `ItemGet{Pending}` trừ phần đang bay để hiển thị mượt.
+>
+> **Không mất thưởng**: bơm quyền sở hữu vào `Pending` sớm bằng `ItemAdd{Pending=true}` (persist ngay), rồi `ItemFlyPending{Key}` (không truyền `Value`) lúc muốn bay. Kill giữa chừng → boot fold `Pending→Current`. Nguồn số lượng luôn là `Pending` nên không desync.
 
 ## Feature (mở khoá tính năng theo level)
 
