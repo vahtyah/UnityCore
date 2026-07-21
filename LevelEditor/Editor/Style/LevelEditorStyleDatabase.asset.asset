@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2950536a05e4cfa9d81f6f69f5b9f7f, type: 3}
+  m_Name: LevelEditorStyleDatabase.asset
+  m_EditorClassIdentifier: VahTyah.LevelEditor.Editor::VahTyah.LevelEditor.LevelEditorStylesDatabase
+  styles: []
+  levelEditorScenePath: Assets/LevelEditor/Editor/Scenes/LevelEditor.unity
+  levelEditorSceneName: LevelEditor
+  levelEditorConfig:
+    levelPropertyName: Levels
+    levelDatabaseTypeName: LevelDatabaseConfig
+    levelTypeName: LevelData
+    levelFolderPath: Assets/Game/Data/Levels
+    levelHandlerTypeName: LevelsHandler

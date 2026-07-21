@@ -87,6 +87,7 @@ Mỗi module là 1 `ScriptableObject` asset trong `Config/`, thêm vào `ModuleC
 - **Menu**: `VahTyah/Modules/Item` · **Save key**: `items` (`ItemSaveData`, keyed by string)
 - **Knobs**: `Items` (List `ItemDefinition{Key, Title, Icon, Prefab, StartAmount}`) + tham số animation (`SpawnRadius, StaggerDelay, Duration, CurveStrength, MoveCurve, ScaleCurve, MaxPoolSize, CanvasSortingOrder`).
 - Quản lý tài nguyên theo string key. **Pending/in-flight pattern** cho animation item bay (xem EVENTS.md → Item). Tự tạo Canvas overlay riêng cho animation.
+- **Shortcut tĩnh** `Item` (bọc EventBus): `Item.Get(key)`, `Item.TrySpend(key, value)`, `Item.Add(key, value, pending)`, `Item.Collect(key, from, value)`, `Item.FlyPending(key, from, value)`. Query đọc được ngay vì handler chạy sync — khỏi tự tạo biến hứng `Reply`.
 
 ### ModuleFeature
 - **Menu**: `VahTyah/Modules/Feature`
