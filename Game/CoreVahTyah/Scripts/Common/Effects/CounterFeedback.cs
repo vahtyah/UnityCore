@@ -20,17 +20,21 @@ namespace VahTyah
     public class CounterFeedback : MonoBehaviour
     {
         [BoxGroup("Change Animation")]
+        [Tooltip("Transform bị scale. Bỏ trống → scale chính GameObject này. Đừng trỏ vào node bị LayoutGroup/ContentSizeFitter đo.")]
+        [SerializeField] private Transform _scaleTarget;
+
+        [BoxGroup("Change Animation")]
         [Tooltip("Bump scale khi giá trị TĂNG (mua, collect, cộng thưởng...).")]
         [SerializeField] private bool _animateOnIncrease = true;
+        [BoxGroup("Change Animation")]
+        [ShowIf(nameof(_animateOnIncrease))]
+        [SerializeField] private AnimationCurve _increaseAnim = DefaultIncrease();
+
         [BoxGroup("Change Animation")]
         [Tooltip("Bump scale khi giá trị GIẢM (tiêu...). Tắt nếu để component feedback khác lo (vd InteractableFeedback).")]
         [SerializeField] private bool _animateOnDecrease = true;
         [BoxGroup("Change Animation")]
-        [Tooltip("Transform bị scale. Bỏ trống → scale chính GameObject này. Đừng trỏ vào node bị LayoutGroup/ContentSizeFitter đo.")]
-        [SerializeField] private Transform _scaleTarget;
-        [BoxGroup("Change Animation")]
-        [SerializeField] private AnimationCurve _increaseAnim = DefaultIncrease();
-        [BoxGroup("Change Animation")]
+        [ShowIf(nameof(_animateOnDecrease))]
         [SerializeField] private AnimationCurve _decreaseAnim = DefaultDecrease();
 
         [BoxGroup("Sorting"), AutoRef]
@@ -39,6 +43,7 @@ namespace VahTyah
         [Tooltip("Khi animate, tạm bật overrideSorting để đẩy lên trên các canvas khác (không đụng canvas cha). Xong trả về gốc.")]
         [SerializeField] private bool _raiseSortingOnAnimate = true;
         [BoxGroup("Sorting")]
+        [ShowIf(nameof(_raiseSortingOnAnimate))]
         [Tooltip("sortingOrder khi được nâng. Cao hơn sortingOrder của popup/overlay cao nhất cần vượt.")]
         [SerializeField] private int _raisedSortingOrder = 9999;
 

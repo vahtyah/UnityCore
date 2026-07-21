@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using VahTyah.Inspector;
 
 public enum ConditionOperator { And, Or }
 

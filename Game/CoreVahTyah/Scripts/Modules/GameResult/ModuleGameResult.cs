@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VahTyah.Inspector;
 
@@ -20,7 +19,6 @@ namespace VahTyah
         [SerializeReference, SubclassSelector]
         private IGameResultHandler _handler = new EventGameResultHandler();
 
-        // Override runtime (vd LevelEditor). null → dùng _handler mặc định.
         private IGameResultHandler _override;
         private bool _gameEnded;
 

@@ -592,11 +592,11 @@ MonoBehaviour:
   _winConditions: []
   _loseConditions: []
   _handler:
-    rid: 6003651736982257735
+    rid: 6003651736982257738
   references:
     version: 2
     RefIds:
-    - rid: 6003651736982257735
+    - rid: 6003651736982257738
       type: {class: EventGameResultHandler, ns: , asm: Assembly-CSharp}
       data: 
 --- !u!114 &7264247442000720890
