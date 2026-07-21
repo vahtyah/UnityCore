@@ -35,6 +35,19 @@ Mỗi module là 1 `ScriptableObject` asset trong `Config/`, thêm vào `ModuleC
 - **Knobs**: `_autoFrameRate`, `_defaultFrameRate` (30/60/90/120), `_batterySaveFrameRate` (iOS low-power), `_vSyncCount`, `_sleepTimeout`.
 - Set `Application.targetFrameRate`, vSync, sleep timeout lúc boot.
 
+### ModuleConsent
+- **Menu**: `VahTyah/Modules/Consent` · **Save key**: `consent` (`ConsentSaveData{UMPGranted, ATTGranted}`)
+- **Knobs**: — (không có; boot ngay sau `ModuleSave` nhờ `[ModuleRequires(ModuleSave)]`).
+- Lưu + trả 2 cờ đồng ý quảng cáo: **UMP/GDPR** (cá nhân hoá ads, người dùng EU) và **ATT** (App Tracking Transparency, iOS 14.5+). Nghe `ConsentUMPGranted`/`ConsentATTGranted` theo pattern set-hoặc-get (xem [EVENTS.md](EVENTS.md)). Nền tảng ≠ iOS → ATT luôn trả `true`.
+
+> ⚠️ **ĐỌC TRƯỚC KHI ĐỘNG VÀO / KHI TÍCH HỢP SDK ADS.** Module này **chỉ là state store** — nó lưu và trả về cờ, **KHÔNG hiện popup UMP/ATT**. Do đó bản thân nó **chưa đủ để phát hành**: build gửi Voodoo vẫn cần consent flow thật.
+>
+> Popup UMP và prompt ATT do **SDK ads bên ngoài** (Voodoo/AppLovin, hoặc `ATTrackingManager` của iOS) gọi — phần đó hiện **chưa có** trong cả Core lẫn CoreVahTyah. Khi tích hợp SDK, bên wiring SDK phải:
+> 1. Gọi UMP consent form + ATT prompt thật lúc khởi động.
+> 2. `EventBus.Publish(new ConsentUMPGranted { Value = <kết quả> })` và tương tự cho ATT → `ModuleConsent` persist cờ.
+> 3. Các module ads đọc lại cờ qua `ConsentUMPGranted`/`ConsentATTGranted` (không truyền `Value`) trước khi request ads.
+> 4. **Cập nhật lại chính mục này** khi hành vi/flow đổi — nêu rõ SDK nào gọi, gọi ở đâu, lúc nào.
+
 ---
 
 ## Gameplay & Kinh tế

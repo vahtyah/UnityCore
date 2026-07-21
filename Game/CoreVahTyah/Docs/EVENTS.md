@@ -97,6 +97,15 @@ API surface để module giao tiếp. Tất cả là `struct : IEvent`. Publish 
 > ```
 > Bật/tắt + volume đọc từ `SettingsService` (SSOT). Xem [CONVENTIONS.md](CONVENTIONS.md) → "Command → Service hay Event?" và [MODULES.md](MODULES.md).
 
+## Consent (đồng ý quảng cáo — UMP/GDPR + ATT)
+
+| Event | Loại | Field | Ghi chú |
+|-------|------|-------|---------|
+| `ConsentUMPGranted` | Query (set-hoặc-get) | `bool? Value; Action<bool> Reply` | `Value` có → ghi cờ UMP; luôn `Reply` cờ đang lưu |
+| `ConsentATTGranted` | Query (set-hoặc-get) | `bool? Value; Action<bool> Reply` | Như trên cho ATT. **Nền tảng ≠ iOS → luôn `Reply(true)`** |
+
+> ⚠️ **Không event nào hiện popup.** Popup UMP / prompt ATT do SDK ads bên ngoài gọi rồi publish kết quả (`Value=…`) vào đây để `ModuleConsent` persist. Xem [MODULES.md](MODULES.md) → ModuleConsent.
+
 ## Settings
 
 | Event | Loại | Field | Ghi chú |

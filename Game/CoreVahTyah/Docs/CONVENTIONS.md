@@ -113,7 +113,7 @@ Ví dụ thêm `ModuleDailyReward`:
 
 ### Thứ tự boot = data, không phải thao tác tay
 Ràng buộc thứ tự khai báo bằng `[ModuleRequires(typeof(...))]` trên chính class module; `ModuleConfigEditor` topo-sort ổn định theo đồ thị đó, nút **Doctor** (hiện ngay trong Inspector) cảnh báo nếu order vi phạm / thiếu `[CoreModule]` / trùng type / null. Các ràng buộc hiện đã encode:
-- `ModuleSettingsScreen`, `ModuleHeart`, `ModuleLevel`, `ModuleItem`, `ModuleTutorial` → `[ModuleRequires(ModuleSave)]`.
+- `ModuleSettingsScreen`, `ModuleHeart`, `ModuleLevel`, `ModuleItem`, `ModuleTutorial`, `ModuleConsent` → `[ModuleRequires(ModuleSave)]`.
 - `ModuleSound`/`ModuleMusic`/`ModuleHaptic` → `[ModuleRequires(ModuleSettingsScreen)]` (⇒ transitively sau `ModuleSave`).
 - `ModuleParticle` → `[ModuleRequires(ModulePool)]`.
 - `ModuleSave` gắn `[CoreModule]` (bắt buộc, ẩn nút Remove; Doctor tự offer add nếu thiếu).
