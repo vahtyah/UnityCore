@@ -1,32 +1,40 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 public enum ConditionOperator { And, Or }
 
+[Serializable]
 public sealed class CompositeWinCondition : IWinCondition
 {
-    private readonly ConditionOperator   _op;
-    private readonly List<IWinCondition> _conditions;
+    [SerializeField] private ConditionOperator _op = ConditionOperator.And;
 
-    public string Reason { get; }
+    [SerializeReference, SubclassSelector]
+    private List<IWinCondition> _conditions = new List<IWinCondition>();
+
+    public CompositeWinCondition() { }
 
     public CompositeWinCondition(ConditionOperator op, params IWinCondition[] conditions)
     {
         _op         = op;
         _conditions = new List<IWinCondition>(conditions);
-        Reason      = BuildReason();
     }
 
-    public bool Evaluate(in WinLoseContext ctx)
+    public string Reason => BuildReason();
+
+    public bool Evaluate()
     {
+        if (_conditions == null || _conditions.Count == 0) return false;
+
         if (_op == ConditionOperator.And)
         {
             foreach (var c in _conditions)
-                if (!c.Evaluate(in ctx)) return false;
+                if (c == null || !c.Evaluate()) return false;
             return true;
         }
 
         foreach (var c in _conditions)
-            if (c.Evaluate(in ctx)) return true;
+            if (c != null && c.Evaluate()) return true;
         return false;
     }
 
@@ -37,37 +45,43 @@ public sealed class CompositeWinCondition : IWinCondition
         for (int i = 0; i < _conditions.Count; i++)
         {
             if (i > 0) parts.Append(op);
-            parts.Append('[').Append(_conditions[i].Reason).Append(']');
+            parts.Append('[').Append(_conditions[i]?.Reason).Append(']');
         }
         return parts.ToString();
     }
 }
 
+[Serializable]
 public sealed class CompositeLoseCondition : ILoseCondition
 {
-    private readonly ConditionOperator    _op;
-    private readonly List<ILoseCondition> _conditions;
+    [SerializeField] private ConditionOperator _op = ConditionOperator.And;
 
-    public string Reason { get; }
+    [SerializeReference, SubclassSelector]
+    private List<ILoseCondition> _conditions = new List<ILoseCondition>();
+
+    public CompositeLoseCondition() { }
 
     public CompositeLoseCondition(ConditionOperator op, params ILoseCondition[] conditions)
     {
         _op         = op;
         _conditions = new List<ILoseCondition>(conditions);
-        Reason      = BuildReason();
     }
 
-    public bool Evaluate(in WinLoseContext ctx)
+    public string Reason => BuildReason();
+
+    public bool Evaluate()
     {
+        if (_conditions == null || _conditions.Count == 0) return false;
+
         if (_op == ConditionOperator.And)
         {
             foreach (var c in _conditions)
-                if (!c.Evaluate(in ctx)) return false;
+                if (c == null || !c.Evaluate()) return false;
             return true;
         }
 
         foreach (var c in _conditions)
-            if (c.Evaluate(in ctx)) return true;
+            if (c != null && c.Evaluate()) return true;
         return false;
     }
 
@@ -78,7 +92,7 @@ public sealed class CompositeLoseCondition : ILoseCondition
         for (int i = 0; i < _conditions.Count; i++)
         {
             if (i > 0) parts.Append(op);
-            parts.Append('[').Append(_conditions[i].Reason).Append(']');
+            parts.Append('[').Append(_conditions[i]?.Reason).Append(']');
         }
         return parts.ToString();
     }

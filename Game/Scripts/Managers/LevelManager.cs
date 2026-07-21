@@ -34,7 +34,6 @@ public class LevelManager : MonoBehaviour
 
     private void FinalizeLevel()
     {
-        WinLoseChecker.Initialize();
     }
 
     private void InitializeSystem(LevelData levelData)
@@ -45,7 +44,6 @@ public class LevelManager : MonoBehaviour
     private void ClearLevel()
     {
         ClearSpawners();
-        WinLoseChecker.Dispose();
         LevelContext.Dispose();
     }
 
