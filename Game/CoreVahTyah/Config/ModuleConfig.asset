@@ -161,6 +161,66 @@ MonoBehaviour:
     Icon: {fileID: 21300000, guid: 84177d768746a447e9ff92c6deb96795, type: 3}
   BuyPanelPrefab: {fileID: 4322520909098502925, guid: 5382d1ff2455b9d4cb9d851828eeab13, type: 3}
   BoosterButtonsPrefab: {fileID: 8633868126875942248, guid: 4b57eebd5cd569c40a5620e5472fdfc8, type: 3}
+--- !u!114 &-4260841466565456855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 752647d2728f0499aa979b67d36fbf1e, type: 3}
+  m_Name: Module_Notifications
+  m_EditorClassIdentifier: Assembly-CSharp::VahTyah.ModuleNotifications
+  _androidChannelId: game_notifications
+  _androidChannelName: Game Notifications
+  _androidChannelDescription: In-game and re-engagement notifications.
+  _androidSmallIconId: 
+  _androidIcons: []
+  _reEngagement:
+  - Id: reengagement_0
+    Title: We miss you!
+    Body: "Your adventure is waiting \u2014 come back and play!"
+    DelayHours: 2
+  - Id: reengagement_1
+    Title: Don't stop now!
+    Body: Big rewards are ready for you. Come claim them!
+    DelayHours: 23
+  - Id: reengagement_2
+    Title: Still there?
+    Body: A special bonus is waiting just for you.
+    DelayHours: 47
+  - Id: reengagement_3
+    Title: Your adventure awaits!
+    Body: "Three days gone \u2014 your next quest is ready and waiting."
+    DelayHours: 71
+  - Id: reengagement_4
+    Title: Your team needs you!
+    Body: Five days away? Jump back in and pick up where you left off!
+    DelayHours: 119
+  - Id: reengagement_5
+    Title: Time to come back!
+    Body: "It's been a week \u2014 your rewards are piling up!"
+    DelayHours: 167
+  - Id: reengagement_6
+    Title: We saved your spot!
+    Body: "Ten days away \u2014 your adventure is still here waiting for you."
+    DelayHours: 239
+  - Id: reengagement_7
+    Title: One more chance!
+    Body: "Two weeks gone \u2014 come back and claim your comeback reward!"
+    DelayHours: 335
+  - Id: reengagement_8
+    Title: We haven't forgotten!
+    Body: Three weeks away? A special gift is waiting just for you.
+    DelayHours: 503
+  - Id: reengagement_9
+    Title: Last call!
+    Body: "A whole month gone \u2014 your ultimate comeback reward is ready!"
+    DelayHours: 671
+  _maxScheduled: 10
+  _rescheduleCooldownHours: 1
 --- !u!114 &-2134619344903844106
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -333,6 +393,7 @@ MonoBehaviour:
   - {fileID: 7936823019446891407}
   - {fileID: -7834782502262248060}
   - {fileID: -5105340681650434850}
+  - {fileID: -4260841466565456855}
 --- !u!114 &201471467427412062
 MonoBehaviour:
   m_ObjectHideFlags: 0

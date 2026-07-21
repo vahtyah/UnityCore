@@ -14,7 +14,7 @@ public class ModuleTestGUI : MonoBehaviour
     [SerializeField] private float _referenceWidth = 1080f;
     [SerializeField] private bool _visible = true;
 
-    private readonly string[] _tabs = { "Level", "Haptic", "Heart", "Item", "Sound", "Music" };
+    private readonly string[] _tabs = { "Level", "Haptic", "Heart", "Item", "Sound", "Music", "Notif" };
     private int _tab;
 
     // Level
@@ -26,6 +26,10 @@ public class ModuleTestGUI : MonoBehaviour
 
     // Item
     private string _itemKey = "coin";
+
+    // Notif
+    private string _notifId = "test_notif";
+    private int _notifDelay = 10;
 
     // Haptic
     private bool _hapticForce;
@@ -130,6 +134,7 @@ public class ModuleTestGUI : MonoBehaviour
             case 3: DrawItem(); break;
             case 4: DrawSound(); break;
             case 5: DrawMusic(); break;
+            case 6: DrawNotifications(); break;
         }
     }
 
@@ -338,6 +343,49 @@ public class ModuleTestGUI : MonoBehaviour
         if (GUILayout.Button("75%", _button, GUILayout.Height(80f))) Music.SetVolume(0.75f);
         if (GUILayout.Button("100%", _button, GUILayout.Height(80f))) Music.SetVolume(1f);
         GUILayout.EndHorizontal();
+    }
+
+    // ── Notif ─────────────────────────────────────────────
+    private void DrawNotifications()
+    {
+        if (!EventBus.HasListeners<NotificationSchedule>())
+        {
+            GUILayout.Label("ModuleNotifications chưa active.\nThêm Module_Notifications vào ModuleConfig + chạy qua boot scene.", _label);
+            return;
+        }
+
+#if UNITY_EDITOR
+        GUILayout.Label("Editor = no-op (provider Default). Build lên device + cài Unity Mobile Notifications mới bắn thật.", _sub);
+#endif
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Id", _label, GUILayout.Width(80f));
+        _notifId = GUILayout.TextField(_notifId, _field, GUILayout.Height(72f));
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Delay (giây)", _label, GUILayout.Width(220f));
+        _notifDelay = IntField(_notifDelay, 1, 86400);
+        GUILayout.EndHorizontal();
+
+        if (Btn($"Schedule  ('{_notifId}' sau {_notifDelay}s)"))
+            EventBus.Publish(new NotificationSchedule
+            {
+                Id = _notifId,
+                Title = "Test notification",
+                Body = $"Đây là '{_notifId}' hẹn {_notifDelay}s.",
+                DelaySeconds = _notifDelay
+            }).Forget();
+
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("Cancel Id", _button, GUILayout.Height(84f)))
+            EventBus.Publish(new NotificationCancel { Id = _notifId }).Forget();
+        if (GUILayout.Button("Cancel All", _button, GUILayout.Height(84f)))
+            EventBus.Publish(new NotificationCancelAll()).Forget();
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(8f);
+        GUILayout.Label("Re-engagement (tự động lúc AppPaused/Quit) — test bằng cách:\nSchedule → nhấn Home (không kill) → chờ, hoặc chỉnh giờ máy tới mốc.", _sub);
     }
 
     // ── Widgets ───────────────────────────────────────────

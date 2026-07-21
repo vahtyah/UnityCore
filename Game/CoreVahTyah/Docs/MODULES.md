@@ -48,6 +48,27 @@ Mỗi module là 1 `ScriptableObject` asset trong `Config/`, thêm vào `ModuleC
 > 3. Các module ads đọc lại cờ qua `ConsentUMPGranted`/`ConsentATTGranted` (không truyền `Value`) trước khi request ads.
 > 4. **Cập nhật lại chính mục này** khi hành vi/flow đổi — nêu rõ SDK nào gọi, gọi ở đâu, lúc nào.
 
+### ModuleNotifications
+- **Menu**: `VahTyah/Modules/Notifications` · **Save key**: `notifications` (`NotificationsSaveData{LastPlayBinary, LastScheduledBinary}`)
+- **Knobs**: `_androidChannelId/Name/Description`; `_androidIcons` (List `NotificationIcon{Id, IsSmall, Texture}` — icon bake vào Project Settings); `_androidSmallIconId` (dropdown chọn 1 Small icon đã đăng ký, hoặc **Auto**); `_reEngagement` (List `ReEngagementEntry{Id, Title, Body, DelayHours}`, mặc định 10 mục 2h→~28 ngày); `_maxScheduled` (1-10); `_rescheduleCooldownHours`.
+- Lên lịch/huỷ local notification qua event `NotificationSchedule`/`Cancel`/`CancelAll`. **Tự động re-engagement**: nghe `AppPaused`/`AppQuitting` → lên lịch chuỗi (có cooldown chống lên lịch lại liên tục), nghe `AppResumed` + lúc boot → huỷ hết. Trừu tượng nền tảng qua `INotificationProvider`. Timestamp lưu dạng `DateTime.ToBinary()` (JsonUtility không lưu `DateTime`).
+
+> ⚠️ **PROVIDER & PHỤ THUỘC PACKAGE.** Trong **Editor** provider luôn là **NO-OP** (`NotificationProviderDefault`) — logic lịch/cooldown chạy đúng nhưng không có notification thật; điều này là cố ý (test không spam OS).
+>
+> Provider thật nằm ở `Modules/Notifications/Platform/` (`AndroidNotificationProvider`, `IOSNotificationProvider`, `NotificationRegistrar`), bọc **Unity Mobile Notifications** (`com.unity.mobile.notifications`). Guard: `#if UNITY_ANDROID/UNITY_IOS && !UNITY_EDITOR && VAHTYAH_MOBILE_NOTIFICATIONS`. `NotificationRegistrar` `[RuntimeInitializeOnLoadMethod(BeforeSceneLoad)]` tự chọn provider trước khi module init.
+>
+> **Cài bằng 1 nút**: chọn asset module trong Inspector → nút **"Install Unity Mobile Notifications"** (`[Button]`). Nó `Client.Add` package **rồi tự thêm scripting define `VAHTYAH_MOBILE_NOTIFICATIONS`** (Android + iOS) → Unity recompile → provider thật bật lên. Không cần thao tác Package Manager tay. Nút này chỉ hiện khi **chưa** có define (`#if !VAHTYAH_MOBILE_NOTIFICATIONS`) → cài xong tự biến mất.
+>
+> **Chưa cài package thì build có sao không? KHÔNG.** Define chưa bật → code provider bị loại khỏi compile → registrar trả null → factory fallback no-op. Build vẫn chạy bình thường, chỉ là không có notification thật. (Đây là lý do dùng define chứ không chỉ `#if UNITY_ANDROID`.)
+>
+> **Android small icon** (gotcha): Android **bắt buộc** một small icon (status bar) là **silhouette đơn sắc** trắng-trên-trong-suốt (chỉ render alpha channel; màu bị bỏ). Thiếu nó → fallback app icon → nhiều máy hiện ô xám hoặc **KHÔNG hiện notification**. iOS không cần (tự dùng app icon).
+> - **Đăng ký icon bằng 1 nút**: fill mảng `_androidIcons` (mỗi entry `Id` + `IsSmall` + `Texture`) → nút **"Setup Notification Icons"** ghi **thẳng** vào Project Settings → Mobile Notifications qua reflection (`NotificationSettingsManager.DrawableResources`), thay entry trùng `Id`. Reflection có try/catch + fallback mở settings để thêm tay nếu API package đổi. (Thay cho nút "Open Settings" cũ.)
+> - **Chọn icon dùng runtime**: `_androidSmallIconId` là dropdown (attribute `[SmallIconId]`) liệt kê các Small icon đã đăng ký + option **Auto**. Runtime resolve theo `ModuleNotifications.ResolveAndroidSmallIconId()`: có chọn rõ → dùng cái đó; **Auto** + đúng 1 Small icon → tự lấy; Auto + nhiều Small icon → trả `null` → fallback app icon (buộc phải chọn rõ khi có nhiều). Id không khớp mảng → dropdown hiện `(missing!)`.
+>
+> **Chỉ là local notification** (lịch trên máy). Muốn gửi campaign từ server (segment/A-B nội dung) là **push** — cần SDK riêng (FCM/OneSignal), thêm kênh riêng, không thay thế module này.
+>
+> **Phụ thuộc**: dựa trên event vòng đời `AppPaused/AppResumed/AppQuitting` do `Bootstrap` phát (xem [EVENTS.md](EVENTS.md) → App lifecycle). Config hiện đọc thẳng từ field asset; khi có RemoteConfig có thể overlay (bản Core cũ làm vậy qua `SADataProvider`).
+
 ---
 
 ## Gameplay & Kinh tế

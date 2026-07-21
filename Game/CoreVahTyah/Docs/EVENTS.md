@@ -19,6 +19,24 @@ API surface để module giao tiếp. Tất cả là `struct : IEvent`. Publish 
 | `SceneUnloading` | Notify | — | Trước khi load scene (Pool `ReturnAll` tại đây) |
 | `SceneLoaded` | Notify | `int Index` | Sau khi scene đã activate xong |
 
+## App lifecycle
+
+| Event | Loại | Field | Ghi chú |
+|-------|------|-------|---------|
+| `AppPaused` | Notify | — | App ra nền; `Bootstrap` phát từ `OnApplicationPause(true)` |
+| `AppResumed` | Notify | — | App về foreground; `Bootstrap` phát từ `OnApplicationPause(false)` |
+| `AppQuitting` | Notify | — | App sắp thoát; `Bootstrap` phát từ `OnApplicationQuit` (Android thường chỉ có `AppPaused`) |
+
+## Notifications (local notification + re-engagement)
+
+| Event | Loại | Field | Ghi chú |
+|-------|------|-------|---------|
+| `NotificationSchedule` | Cmd | `string Id; string Title; string Body; DateTime TriggerTime; float DelaySeconds` | Lên lịch. `TriggerTime` default → dùng `DelaySeconds` từ hiện tại |
+| `NotificationCancel` | Cmd | `string Id` | Huỷ 1 notification |
+| `NotificationCancelAll` | Cmd | — | Huỷ tất cả |
+
+> ⚠️ Provider mặc định **no-op** — chưa bắn notification OS thật cho tới khi đăng ký provider nền tảng. Xem [MODULES.md](MODULES.md) → ModuleNotifications.
+
 ## Screen / UI
 
 | Event | Loại | Field | Ghi chú |

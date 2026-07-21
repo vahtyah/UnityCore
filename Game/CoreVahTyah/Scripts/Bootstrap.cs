@@ -56,5 +56,15 @@ namespace VahTyah
             }
         }
 
+        // Chuyển tiếp vòng đời app vào EventBus (xem AppEvents.cs). Không có listener → no-op (fast-path).
+        private void OnApplicationPause(bool paused)
+        {
+            if (paused)
+                EventBus.Publish(new AppPaused()).Forget();
+            else
+                EventBus.Publish(new AppResumed()).Forget();
+        }
+
+        private void OnApplicationQuit() => EventBus.Publish(new AppQuitting()).Forget();
     }
 }

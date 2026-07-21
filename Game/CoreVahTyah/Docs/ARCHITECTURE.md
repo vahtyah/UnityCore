@@ -16,6 +16,7 @@ Chi tiết cơ chế của các thành phần nền tảng. Xem [README.md](READ
   4. `await Publish(LoadEntryScene)` — chờ scene game load xong.
   5. Publish `BootCompleted`.
 - Bootstrap **không phát tiến độ** — thanh loading do LoadingScreen tự lo hoàn toàn (intro theo thời gian, fill nốt khi `BootCompleted`).
+- Bootstrap **forward vòng đời app vào EventBus**: `OnApplicationPause` → `AppPaused`/`AppResumed`, `OnApplicationQuit` → `AppQuitting` (xem `AppEvents.cs`). Không listener → no-op (fast-path). Dùng bởi `ModuleNotifications` (re-engagement) và mọi module cần biết app rời/về.
 - `transform` của Bootstrap được truyền vào `InitializeAsync` làm **holder** — module gắn runner GameObject vào đây để sống xuyên scene.
 
 ## 2. Module — đơn vị tính năng
